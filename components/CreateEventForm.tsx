@@ -21,6 +21,7 @@ const CreateEventForm = () => {
     date: "",
     time: "",
     location: "",
+    venue: "",
     eventType: "",
     tags: "",
     description: "",
@@ -28,7 +29,7 @@ const CreateEventForm = () => {
     agenda: "",
     audience: "",
     organizer: "",
-    mode: "In-person",
+    mode: "offline",
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -72,6 +73,7 @@ const CreateEventForm = () => {
       submitFormData.append("date", formData.date);
       submitFormData.append("time", formData.time);
       submitFormData.append("location", formData.location);
+      submitFormData.append("venue", formData.venue);
       submitFormData.append("mode", formData.mode);
       submitFormData.append("description", formData.description);
       submitFormData.append(
@@ -109,7 +111,7 @@ const CreateEventForm = () => {
       } else {
         const error = await response.json();
         console.error("Failed to create event:", error);
-        alert("Failed to create event. Please try again.");
+        alert("Failed to create event: " + error.message);
       }
     } catch (error) {
       console.error("Error creating event:", error);
@@ -172,17 +174,34 @@ const CreateEventForm = () => {
         </div>
       </div>
 
-      {/* Event Location/Venue */}
+      {/* Event Location (City) */}
       <div className="form-group">
-        <label htmlFor="location">Event Venue</label>
+        <label htmlFor="location">Location (City/State)</label>
         <div className="input-with-icon">
           <Image src="/icons/pin.svg" alt="location" width={16} height={16} />
           <input
             type="text"
             id="location"
             name="location"
-            placeholder="Enter venue or online link"
+            placeholder="e.g. San Francisco, CA"
             value={formData.location}
+            onChange={handleInputChange}
+            required
+          />
+        </div>
+      </div>
+
+      {/* Event Venue */}
+      <div className="form-group">
+        <label htmlFor="venue">Venue Name</label>
+        <div className="input-with-icon">
+          <Image src="/icons/pin.svg" alt="venue" width={16} height={16} />
+          <input
+            type="text"
+            id="venue"
+            name="venue"
+            placeholder="e.g. Moscone Center or Online URL"
+            value={formData.venue}
             onChange={handleInputChange}
             required
           />
@@ -218,9 +237,9 @@ const CreateEventForm = () => {
           onChange={handleInputChange}
           required
         >
-          <option value="In-person">In-person</option>
-          <option value="Online">Online</option>
-          <option value="Hybrid (In-person + Online Streaming)">Hybrid</option>
+          <option value="offline">In-person</option>
+          <option value="online">Online</option>
+          <option value="hybrid">Hybrid</option>
         </select>
       </div>
 
@@ -234,7 +253,7 @@ const CreateEventForm = () => {
             accept="image/*"
             onChange={handleImageChange}
             className="hidden"
-            required
+            required={!imageFile}
           />
           <label htmlFor="image" className="upload-btn">
             {imagePreview ? (
@@ -276,7 +295,7 @@ const CreateEventForm = () => {
           type="text"
           id="tags"
           name="tags"
-          placeholder="Add tags such as react, next, js"
+          placeholder="Add tags separated by comma (e.g. react, nextjs)"
           value={formData.tags}
           onChange={handleInputChange}
         />
@@ -306,6 +325,7 @@ const CreateEventForm = () => {
           value={formData.overview}
           onChange={handleInputChange}
           rows={4}
+          required
         />
       </div>
 
@@ -319,6 +339,7 @@ const CreateEventForm = () => {
           value={formData.agenda}
           onChange={handleInputChange}
           rows={4}
+          required
         />
       </div>
 
@@ -332,6 +353,7 @@ const CreateEventForm = () => {
           placeholder="Developers, DevOps engineers, tech leaders"
           value={formData.audience}
           onChange={handleInputChange}
+          required
         />
       </div>
 
@@ -345,6 +367,7 @@ const CreateEventForm = () => {
           value={formData.organizer}
           onChange={handleInputChange}
           rows={3}
+          required
         />
       </div>
 

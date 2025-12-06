@@ -1,4 +1,4 @@
-// Sample events data matching the UI designs
+// Sample events data matching the UI designs and Schema
 export const sampleEvents = [
   {
     title: "GitHub Universe 2025",
@@ -9,9 +9,10 @@ export const sampleEvents = [
       "GitHub Universe 2025 is back, bringing together developers, innovators, and industry leaders from around the world. This flagship event dives deep into the future of software, open source, and AI-driven development.\n\nExpect hands-on sessions, inspiring keynotes, and networking with the brightest minds shaping the future of tech.",
     image: "/images/event1.png",
     location: "San Francisco, CA",
-    date: "28th October 2025",
-    time: "12:25pm - 2:40pm",
-    mode: "Hybrid (In-person + Online Streaming)",
+    venue: "Yerba Buena Center for the Arts",
+    date: "2025-10-28", // YYYY-MM-DD
+    time: "12:25 PM", // HH:MM AM/PM
+    mode: "hybrid",
     audience: "Developers, DevOps engineers, cloud architects, tech leaders",
     organizer:
       "GitHub is the world's leading platform for developers to build, share, and maintain code. From open source to enterprise, GitHub empowers millions of developers and organizations to innovate faster and more securely.\n\nGitHub Universe is its annual developer conference, uniting the global dev community to share knowledge, tools, inspiration that shape the future of software.",
@@ -34,9 +35,10 @@ export const sampleEvents = [
       "Infobip Shift is the leading developer conference in Southeast Europe, gathering thousands of developers, engineers, and tech enthusiasts for two days of learning, networking, and inspiration.",
     image: "/images/event2.png",
     location: "Zadar, Croatia",
-    date: "13th September 2025",
-    time: "12:25pm - 2:40pm",
-    mode: "In-person",
+    venue: "Visnjik Sports Center",
+    date: "2025-09-13",
+    time: "12:25 PM",
+    mode: "offline",
     audience: "Developers, Engineers, Tech Enthusiasts",
     organizer:
       "Infobip is a global leader in omnichannel communication, hosting Shift to bring together the developer community and foster innovation.",
@@ -58,9 +60,10 @@ export const sampleEvents = [
       "Join us for an immersive day exploring the cutting edge of React development. Learn about React 19's new features, server components, and modern frontend architecture patterns.",
     image: "/images/event3.png",
     location: "San Francisco, CA",
-    date: "7th February 2024",
-    time: "12:25pm - 2:40pm",
-    mode: "Hybrid (In-person + Online Streaming)",
+    venue: "Metreon City View",
+    date: "2024-02-07",
+    time: "12:25 PM",
+    mode: "hybrid",
     audience: "Frontend Developers, React Engineers",
     organizer:
       "React Community organizers passionate about sharing knowledge and building the future of web development.",
@@ -81,9 +84,10 @@ export const sampleEvents = [
       "DevWorld brings together over 10,000 developers from around the globe for three days of learning, networking, and innovation. Experience keynotes from industry leaders and hands-on workshops.",
     image: "/images/event4.png",
     location: "Zadar, Croatia",
-    date: "13th November 2025",
-    time: "10:00am - 2:40pm",
-    mode: "In-person",
+    venue: "Zadar Convention Center",
+    date: "2025-11-13",
+    time: "10:00 AM",
+    mode: "offline",
     audience: "All Developers",
     organizer:
       "DevWorld Foundation, a non-profit organization dedicated to advancing developer education worldwide.",
@@ -104,10 +108,11 @@ export const sampleEvents = [
     overview:
       "The Cloudinary User Summit is your opportunity to learn from media optimization experts, connect with fellow developers, and discover how to build better visual experiences.",
     image: "/images/event5.png",
-    location: "The Midway, SF",
-    date: "22th October 2025",
-    time: "12:25pm - 2:40pm",
-    mode: "In-person",
+    location: "San Francisco, CA",
+    venue: "The Midway",
+    date: "2025-10-22",
+    time: "12:25 PM",
+    mode: "offline",
     audience: "Web Developers, Media Engineers",
     organizer:
       "Cloudinary, the leading media management platform trusted by over 1.5 million developers worldwide.",
@@ -127,10 +132,11 @@ export const sampleEvents = [
     overview:
       "Vercel Ship is the annual conference for frontend developers and teams building on the edge. Learn about the latest Next.js features, deployment strategies, and frontend infrastructure.",
     image: "/images/event6.png",
-    location: "New York City",
-    date: "7th February 2025",
-    time: "12:25pm - 2:40pm",
-    mode: "Online",
+    location: "New York City, NY",
+    venue: "Online Platform",
+    date: "2025-02-07",
+    time: "12:25 PM",
+    mode: "online",
     audience: "Frontend Developers, Platform Engineers",
     organizer:
       "Vercel, creators of Next.js and the leading frontend cloud platform.",

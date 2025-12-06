@@ -10,6 +10,19 @@ import { EventViewTracker } from "@/components/analytics/EventTracking";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
+const formatMode = (mode: string) => {
+  switch (mode) {
+    case "offline":
+      return "In-person";
+    case "online":
+      return "Online";
+    case "hybrid":
+      return "Hybrid";
+    default:
+      return mode;
+  }
+};
+
 const EventDetails = async ({ params }: { params: Promise<string> }) => {
   "use cache";
   cacheLife("hours");
@@ -47,6 +60,7 @@ const EventDetails = async ({ params }: { params: Promise<string> }) => {
     date,
     time,
     location,
+    venue,
     mode,
     agenda,
     audience,
@@ -124,7 +138,9 @@ const EventDetails = async ({ params }: { params: Promise<string> }) => {
                   width={18}
                   height={18}
                 />
-                <span>Venue: {location}</span>
+                <span>
+                  Location: {location} {venue ? `(${venue})` : ""}
+                </span>
               </div>
               <div className="detail-item">
                 <Image
@@ -133,7 +149,7 @@ const EventDetails = async ({ params }: { params: Promise<string> }) => {
                   width={18}
                   height={18}
                 />
-                <span>Mode: {mode}</span>
+                <span>Mode: {formatMode(mode)}</span>
               </div>
               <div className="detail-item">
                 <Image
