@@ -7,7 +7,6 @@ import {
 import Image from "next/image";
 import BookEvent from "@/components/BookEvent";
 import EventCard from "@/components/EventCard";
-import { cacheLife } from "next/cache";
 import { EventViewTracker } from "@/components/analytics/EventTracking";
 
 const formatMode = (mode: string) => {
@@ -24,8 +23,6 @@ const formatMode = (mode: string) => {
 };
 
 const EventDetails = async ({ params }: { params: Promise<string> }) => {
-  "use cache";
-  cacheLife("hours");
   const slug = await params;
 
   const event = await getEventBySlug(slug);
