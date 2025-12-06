@@ -1,16 +1,10 @@
-import Link from "next/link";
+import CreateEventForm from "@/components/CreateEventForm";
 
 export default function CreateEventPage() {
   return (
-    <section className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-      <h1 className="text-center">Create Event</h1>
-      <p className="text-center max-w-lg">
-        This feature is coming soon! You'll be able to create and share your own
-        developer events.
-      </p>
-      <Link href="/" className="button-submit">
-        Back to Home
-      </Link>
+    <section className="create-event-page">
+      <h1>Create an Event</h1>
+      <CreateEventForm />
     </section>
   );
 }

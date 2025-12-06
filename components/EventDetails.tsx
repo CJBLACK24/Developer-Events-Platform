@@ -10,42 +10,6 @@ import { EventViewTracker } from "@/components/analytics/EventTracking";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
-const EventDetailItem = ({
-  icon,
-  alt,
-  label,
-}: {
-  icon: string;
-  alt: string;
-  label: string;
-}) => (
-  <div className="flex-row-gap-2 items-center">
-    <Image src={icon} alt={alt} width={17} height={17} />
-    <p>{label}</p>
-  </div>
-);
-
-const EventAgenda = ({ agendaItems }: { agendaItems: string[] }) => (
-  <div className="agenda">
-    <h2>Agenda</h2>
-    <ul>
-      {agendaItems.map((item) => (
-        <li key={item}>{item}</li>
-      ))}
-    </ul>
-  </div>
-);
-
-const EventTags = ({ tags }: { tags: string[] }) => (
-  <div className="flex flex-row gap-1.5 flex-wrap">
-    {tags.map((tag) => (
-      <div className="pill" key={tag}>
-        {tag}
-      </div>
-    ))}
-  </div>
-);
-
 const EventDetails = async ({ params }: { params: Promise<string> }) => {
   "use cache";
   cacheLife("hours");
@@ -76,6 +40,7 @@ const EventDetails = async ({ params }: { params: Promise<string> }) => {
   }
 
   const {
+    title,
     description,
     image,
     overview,
@@ -91,96 +56,149 @@ const EventDetails = async ({ params }: { params: Promise<string> }) => {
 
   if (!description) return notFound();
 
-  const bookings = 10;
-
   const similarEvents: IEvent[] = await getSimilarEventsBySlug(slug);
 
   return (
-    <section id="event">
+    <section className="event-details-page">
       {/* PostHog event view tracking */}
       <EventViewTracker
         eventId={event._id}
         eventSlug={slug}
-        eventTitle={description}
+        eventTitle={title}
         eventTags={tags}
       />
 
-      <div className="header">
-        <h1>Event Description</h1>
-        <p>{description}</p>
+      {/* Header Section */}
+      <div className="event-header">
+        <h1>{title}</h1>
+        <p className="event-tagline">{description}</p>
       </div>
 
-      <div className="details">
-        {/*    Left Side - Event Content */}
-        <div className="content">
-          <Image
-            src={image}
-            alt="Event Banner"
-            width={800}
-            height={800}
-            className="banner"
-          />
+      {/* Main Content */}
+      <div className="event-content">
+        {/* Left Side - Event Details */}
+        <div className="event-main">
+          {/* Event Banner */}
+          <div className="event-banner">
+            <Image
+              src={image}
+              alt={title}
+              width={800}
+              height={450}
+              className="banner-image"
+            />
+          </div>
 
-          <section className="flex-col-gap-2">
+          {/* Overview Section */}
+          <div className="event-section">
             <h2>Overview</h2>
             <p>{overview}</p>
-          </section>
+          </div>
 
-          <section className="flex-col-gap-2">
+          {/* Event Details Section */}
+          <div className="event-section">
             <h2>Event Details</h2>
+            <div className="details-list">
+              <div className="detail-item">
+                <Image
+                  src="/icons/calendar.svg"
+                  alt="date"
+                  width={18}
+                  height={18}
+                />
+                <span>Date: {date}</span>
+              </div>
+              <div className="detail-item">
+                <Image
+                  src="/icons/clock.svg"
+                  alt="time"
+                  width={18}
+                  height={18}
+                />
+                <span>Time: {time}</span>
+              </div>
+              <div className="detail-item">
+                <Image
+                  src="/icons/pin.svg"
+                  alt="venue"
+                  width={18}
+                  height={18}
+                />
+                <span>Venue: {location}</span>
+              </div>
+              <div className="detail-item">
+                <Image
+                  src="/icons/mode.svg"
+                  alt="mode"
+                  width={18}
+                  height={18}
+                />
+                <span>Mode: {mode}</span>
+              </div>
+              <div className="detail-item">
+                <Image
+                  src="/icons/audience.svg"
+                  alt="audience"
+                  width={18}
+                  height={18}
+                />
+                <span>Audience: {audience}</span>
+              </div>
+            </div>
+          </div>
 
-            <EventDetailItem
-              icon="/icons/calendar.svg"
-              alt="calendar"
-              label={date}
-            />
-            <EventDetailItem icon="/icons/clock.svg" alt="clock" label={time} />
-            <EventDetailItem icon="/icons/pin.svg" alt="pin" label={location} />
-            <EventDetailItem icon="/icons/mode.svg" alt="mode" label={mode} />
-            <EventDetailItem
-              icon="/icons/audience.svg"
-              alt="audience"
-              label={audience}
-            />
-          </section>
+          {/* Agenda Section */}
+          {agenda && agenda.length > 0 && (
+            <div className="event-section">
+              <h2>Agenda</h2>
+              <ul className="agenda-list">
+                {agenda.map((item: string, index: number) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-          <EventAgenda agendaItems={agenda} />
-
-          <section className="flex-col-gap-2">
+          {/* Organizer Section */}
+          <div className="event-section">
             <h2>About the Organizer</h2>
             <p>{organizer}</p>
-          </section>
+          </div>
 
-          <EventTags tags={tags} />
+          {/* Tags Section */}
+          {tags && tags.length > 0 && (
+            <div className="event-tags">
+              {tags.map((tag: string) => (
+                <span key={tag} className="tag">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/*    Right Side - Booking Form */}
-        <aside className="booking">
-          <div className="signup-card">
+        {/* Right Side - Booking Form */}
+        <aside className="event-sidebar">
+          <div className="booking-card">
             <h2>Book Your Spot</h2>
-            {bookings > 0 ? (
-              <p className="text-sm">
-                Join {bookings} people who have already booked their spot!
-              </p>
-            ) : (
-              <p className="text-sm">Be the first to book your spot!</p>
-            )}
-
-            <BookEvent eventId={event._id} slug={event.slug} />
+            <BookEvent eventId={event._id} slug={slug} />
           </div>
         </aside>
       </div>
 
-      <div className="flex w-full flex-col gap-4 pt-20">
-        <h2>Similar Events</h2>
-        <div className="events">
-          {similarEvents.length > 0 &&
-            similarEvents.map((similarEvent: IEvent) => (
-              <EventCard key={similarEvent.title} {...similarEvent} />
+      {/* Similar Events Section */}
+      {similarEvents.length > 0 && (
+        <div className="similar-events">
+          <h2>Similar events</h2>
+          <div className="events-grid">
+            {similarEvents.slice(0, 3).map((similarEvent: IEvent) => (
+              <EventCard key={similarEvent.slug} {...similarEvent} />
             ))}
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 };
+
 export default EventDetails;
