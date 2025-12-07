@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import supabase from "@/lib/supabase";
+import { getBaseUrl } from "@/lib/config";
 import { ArrowLeft } from "lucide-react";
 
 export default function SignUpPage() {
@@ -31,7 +32,7 @@ export default function SignUpPage() {
       const { error } = await supabase.auth.signInWithOtp({
         email: formData.email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${getBaseUrl()}/auth/callback`,
           data: {
             full_name: `${formData.firstname} ${formData.lastname}`.trim(),
           },

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import Image from "next/image";
 import supabase from "@/lib/supabase";
+import { getBaseUrl } from "@/lib/config";
 import { LogoIcon } from "@/components/logo";
 
 export default function ForgotPasswordPage() {
@@ -23,7 +24,7 @@ export default function ForgotPasswordPage() {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/update-password`,
+        redirectTo: `${getBaseUrl()}/auth/update-password`,
       });
 
       if (error) throw error;
