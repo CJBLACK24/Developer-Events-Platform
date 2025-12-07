@@ -128,9 +128,9 @@ const CreateEventForm = () => {
         .filter(Boolean);
 
       const formattedDate = normalizeDate(formData.date);
-      const timeString = `${normalizeTime(
-        formData.startTime
-      )} - ${normalizeTime(formData.endTime)}`;
+      // Database expects a valid time string, not a range
+      // We only store start time to avoid "time zone displacement out of range" error
+      const timeString = normalizeTime(formData.startTime);
 
       // 3. Insert into Supabase
       const { error } = await supabase.from("events").insert({
