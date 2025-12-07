@@ -153,11 +153,12 @@ const Navbar = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-dark-300" />
                 <DropdownMenuItem
-                  onClick={signOut}
-                  className="cursor-pointer hover:bg-dark-300 text-red-400 focus:text-red-400"
+                  onSelect={() => signOut()}
+                  className="cursor-pointer hover:bg-dark-300 text-red-400 focus:text-red-400 focus:bg-dark-300"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
                   <span>Log out</span>
+                </DropdownMenuItem>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

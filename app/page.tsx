@@ -23,21 +23,29 @@ const Page = async () => {
   const events = await getAllEvents();
 
   return (
-    <section>
-      <h1 className="text-center">
-        The Hub for Every Dev <br /> Event You Can&apos;t Miss
-      </h1>
-      <p className="text-center mt-5">
-        Hackathons, Meetups, and Conferences, All in One Place
-      </p>
+    <>
+      {/* Hero Section - Centered */}
+      <section className="min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center px-4">
+        <div className="text-center max-w-4xl mx-auto">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight">
+            The Hub for Every Dev <br /> Event You Can&apos;t Miss
+          </h1>
+          <p className="text-gray-400 mt-6 text-lg sm:text-xl max-w-2xl mx-auto">
+            Hackathons, Meetups, and Conferences, All in One Place
+          </p>
 
-      <ExploreBtn />
+          <div className="mt-8">
+            <ExploreBtn />
+          </div>
+        </div>
+      </section>
 
-      <div id="featured-events" className="mt-20 space-y-7">
+      {/* Events Section */}
+      <section id="featured-events" className="container mx-auto px-4 py-16">
         {events && events.length > 0 ? (
           <>
-            <h3>Featured Events</h3>
-            <ul className="events">
+            <h3 className="text-2xl font-bold mb-8">Featured Events</h3>
+            <ul className="events grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {events.map((event: IEvent) => (
                 <li key={event.title} className="list-none">
                   <EventCard {...event} />
@@ -46,12 +54,15 @@ const Page = async () => {
             </ul>
           </>
         ) : (
-          <div className="text-center text-gray-400 mt-10">
+          <div className="text-center text-gray-400 py-20">
             <p className="text-xl">No Events yet</p>
+            <p className="text-sm mt-2">
+              Check back soon for upcoming developer events!
+            </p>
           </div>
         )}
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 
