@@ -1,32 +1,38 @@
 import { NextResponse } from "next/server";
-import connectDB from "@/lib/mongodb";
-import Event from "@/database/event.model";
+import supabase from "@/lib/supabase";
 import { sampleEvents } from "@/lib/sampleEvents";
 
 export async function POST() {
   try {
-    await connectDB();
-
     // Check if events already exist
-    const existingCount = await Event.countDocuments();
+    const { count, error: countError } = await supabase
+      .from("events")
+      .select("*", { count: "exact", head: true });
 
-    if (existingCount > 0) {
+    if (countError) throw countError;
+
+    if (count && count > 0) {
       return NextResponse.json(
         {
-          message: `Database already has ${existingCount} events. Clear them first if you want to reseed.`,
-          count: existingCount,
+          message: `Database already has ${count} events. Clear them first if you want to reseed.`,
+          count: count,
         },
         { status: 200 }
       );
     }
 
     // Insert sample events
-    const result = await Event.insertMany(sampleEvents);
+    const { data, error } = await supabase
+      .from("events")
+      .insert(sampleEvents)
+      .select();
+
+    if (error) throw error;
 
     return NextResponse.json(
       {
-        message: `Successfully seeded ${result.length} events!`,
-        count: result.length,
+        message: `Successfully seeded ${data?.length || 0} events!`,
+        count: data?.length || 0,
       },
       { status: 201 }
     );
@@ -44,14 +50,13 @@ export async function POST() {
 
 export async function DELETE() {
   try {
-    await connectDB();
+    const { error } = await supabase.from("events").delete().neq("id", 0); // Delete all rows
 
-    const result = await Event.deleteMany({});
+    if (error) throw error;
 
     return NextResponse.json(
       {
-        message: `Deleted ${result.deletedCount} events`,
-        count: result.deletedCount,
+        message: "All events deleted",
       },
       { status: 200 }
     );
