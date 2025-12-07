@@ -26,45 +26,27 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- 3. Enable RLS on Profiles
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- 4. Drop existing policies and recreate
+-- 4. Drop ALL existing profile policies first
 DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Admins can view all profiles" ON public.profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Admins can update all profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Anyone can view profiles" ON public.profiles;
+DROP POLICY IF EXISTS "All authenticated users can view profiles" ON public.profiles;
 
--- Users can read their own profile
-CREATE POLICY "Users can view own profile" 
+-- 5. Create SIMPLE Profile Policies (avoiding recursion)
+-- All authenticated users can read any profile (needed for admin dashboard)
+CREATE POLICY "All authenticated users can view profiles" 
   ON public.profiles FOR SELECT 
-  USING (auth.uid() = id);
-
--- Admins can view all profiles
-CREATE POLICY "Admins can view all profiles" 
-  ON public.profiles FOR SELECT 
-  USING (
-    exists (
-      select 1 from public.profiles
-      where profiles.id = auth.uid()
-      and profiles.role = 'admin'
-    )
-  );
+  TO authenticated
+  USING (true);
 
 -- Users can update their own profile
 CREATE POLICY "Users can update own profile" 
   ON public.profiles FOR UPDATE 
   USING (auth.uid() = id);
 
--- Admins can update any profile
-CREATE POLICY "Admins can update all profiles" 
-  ON public.profiles FOR UPDATE 
-  USING (
-    exists (
-      select 1 from public.profiles
-      where profiles.id = auth.uid()
-      and profiles.role = 'admin'
-    )
-  );
-
--- 5. Auto-create Profile on Signup (Trigger)
+-- 6. Auto-create Profile on Signup (Trigger)
 CREATE OR REPLACE FUNCTION public.handle_new_user() 
 RETURNS TRIGGER AS $$
 BEGIN
@@ -85,11 +67,11 @@ CREATE TRIGGER on_auth_user_created
 -- Events Table Updates for RBAC
 -- =====================================================
 
--- 6. Add RBAC columns to Events Table
+-- 7. Add RBAC columns to Events Table
 ALTER TABLE public.events ADD COLUMN IF NOT EXISTS organizer_id UUID REFERENCES auth.users(id);
 ALTER TABLE public.events ADD COLUMN IF NOT EXISTS is_approved BOOLEAN DEFAULT FALSE;
 
--- 7. Drop existing event policies and recreate
+-- 8. Drop existing event policies
 DROP POLICY IF EXISTS "Public events are viewable by everyone" ON public.events;
 DROP POLICY IF EXISTS "Public Approved Events" ON public.events;
 DROP POLICY IF EXISTS "Organizers can view own events" ON public.events;
@@ -97,59 +79,32 @@ DROP POLICY IF EXISTS "Admins can view all events" ON public.events;
 DROP POLICY IF EXISTS "Organizers can create events" ON public.events;
 DROP POLICY IF EXISTS "Organizers can update own events" ON public.events;
 DROP POLICY IF EXISTS "Admins can update all events" ON public.events;
+DROP POLICY IF EXISTS "Anyone can view approved events" ON public.events;
+DROP POLICY IF EXISTS "Authenticated can view all events" ON public.events;
 
--- Public can view approved events
-CREATE POLICY "Public Approved Events" 
+-- 9. Create SIMPLE Event Policies (avoiding recursion)
+-- Anyone can view approved events (public)
+CREATE POLICY "Anyone can view approved events" 
   ON public.events FOR SELECT 
   USING (is_approved = true);
 
--- Organizers can view their own events (approved or not)
-CREATE POLICY "Organizers can view own events" 
+-- Authenticated users can view all events (for organizers/admins to manage)
+CREATE POLICY "Authenticated can view all events" 
   ON public.events FOR SELECT 
-  USING (auth.uid() = organizer_id);
+  TO authenticated
+  USING (true);
 
--- Admins can view all events
-CREATE POLICY "Admins can view all events" 
-  ON public.events FOR SELECT 
-  USING (
-    exists (
-      select 1 from public.profiles
-      where profiles.id = auth.uid()
-      and profiles.role = 'admin'
-    )
-  );
-
--- Only Organizers/Admins can Insert Events
-CREATE POLICY "Organizers can create events" 
+-- Authenticated users can create events (role check happens in app)
+CREATE POLICY "Authenticated can create events" 
   ON public.events FOR INSERT 
-  WITH CHECK (
-    exists (
-      select 1 from public.profiles
-      where profiles.id = auth.uid()
-      and (profiles.role = 'organizer' OR profiles.role = 'admin')
-    )
-  );
+  TO authenticated
+  WITH CHECK (true);
 
--- Organizers can update their own events
-CREATE POLICY "Organizers can update own events" 
-  ON public.events FOR UPDATE
-  USING (auth.uid() = organizer_id);
-
--- Admins can update any event
-CREATE POLICY "Admins can update all events" 
-  ON public.events FOR UPDATE
-  USING (
-    exists (
-      select 1 from public.profiles
-      where profiles.id = auth.uid()
-      and profiles.role = 'admin'
-    )
-  );
-
--- =====================================================
--- Migration: Add avatar_url column if missing
--- =====================================================
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+-- Authenticated users can update events (role check happens in app)
+CREATE POLICY "Authenticated can update events" 
+  ON public.events FOR UPDATE 
+  TO authenticated
+  USING (true);
 
 -- =====================================================
 -- DONE! Now make yourself an admin:

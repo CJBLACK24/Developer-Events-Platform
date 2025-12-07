@@ -51,7 +51,7 @@ export default function RootLayout({
             />
           </div>
 
-          <main>{children}</main>
+          <main className="pt-16">{children}</main>
           <Analytics />
         </AuthProvider>
       </body>
