@@ -4,8 +4,6 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
-import supabase from "@/lib/supabase";
-import { generateSlug, normalizeDate, normalizeTime } from "@/lib/utils";
 import { SuccessDialog } from "@/components/ui/success-dialog";
 import { Clock } from "lucide-react";
 

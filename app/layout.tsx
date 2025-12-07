@@ -37,7 +37,7 @@ export default function RootLayout({
         <AuthProvider>
           <Navbar />
 
-          <div className="absolute inset-0 top-0 z-[-1] min-h-screen">
+          <div className="fixed inset-0 z-0 pointer-events-none">
             <LightRays
               raysOrigin="top-center-offset"
               raysColor="#5dfeca"
@@ -51,7 +51,7 @@ export default function RootLayout({
             />
           </div>
 
-          <main className="pt-16">{children}</main>
+          <main className="pt-16 relative z-10">{children}</main>
           <Analytics />
         </AuthProvider>
       </body>

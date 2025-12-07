@@ -95,13 +95,20 @@ export default function SettingsPage() {
       if (data.url) {
         setAvatarUrl(data.url);
 
-        // Update profile with new avatar URL
-        const { error } = await supabase
-          .from("profiles")
-          .update({ avatar_url: data.url })
-          .eq("id", user.id);
+        // Update profile via API
+        const updateResponse = await fetch("/api/profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: user.id,
+            avatar_url: data.url,
+            full_name: fullName, // Preserve name
+          }),
+        });
 
-        if (error) throw error;
+        if (!updateResponse.ok)
+          throw new Error("Failed to update profile via API");
+
         setProfileMessage({
           type: "success",
           text: "Avatar updated successfully!",
@@ -121,23 +128,18 @@ export default function SettingsPage() {
     setProfileMessage(null);
 
     try {
-      // Update profiles table
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({
+      // Update via API
+      const response = await fetch("/api/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
           full_name: fullName,
           avatar_url: avatarUrl,
-        })
-        .eq("id", user.id);
-
-      if (profileError) throw profileError;
-
-      // Update auth metadata
-      const { error: authError } = await supabase.auth.updateUser({
-        data: { full_name: fullName },
+        }),
       });
 
-      if (authError) throw authError;
+      if (!response.ok) throw new Error("Failed to update profile via API");
 
       setProfileMessage({
         type: "success",
