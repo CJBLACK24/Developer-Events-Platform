@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import supabase from "@/lib/supabase";
 import { generateSlug, normalizeDate, normalizeTime } from "@/lib/utils";
+import { SuccessDialog } from "@/components/ui/success-dialog";
 
 const eventTypes = [
   "Conference",
@@ -37,6 +38,7 @@ const CreateEventForm = () => {
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -147,8 +149,7 @@ const CreateEventForm = () => {
 
       if (error) throw error;
 
-      router.push("/");
-      router.refresh();
+      setShowSuccessDialog(true);
     } catch (error) {
       console.error("Error creating event:", error);
       alert("Failed to create event. " + (error as Error).message);
@@ -410,6 +411,18 @@ const CreateEventForm = () => {
       <button type="submit" className="submit-btn" disabled={isSubmitting}>
         {isSubmitting ? "Saving..." : "Save Event"}
       </button>
+
+      <SuccessDialog
+        open={showSuccessDialog}
+        onClose={() => {
+          setShowSuccessDialog(false);
+          router.push("/");
+          router.refresh();
+        }}
+        title="Event Created!"
+        message="Your event has been successfully created and is now live."
+        buttonText="View Events"
+      />
     </form>
   );
 };

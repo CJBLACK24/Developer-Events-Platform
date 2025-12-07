@@ -4,7 +4,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import supabase from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -23,15 +22,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Users,
-  Calendar,
-  CheckCircle,
-  XCircle,
-  Plus,
-  Pencil,
-  Trash2,
-} from "lucide-react";
+import { SuccessDialog } from "@/components/ui/success-dialog";
+import { Users, Calendar, CheckCircle, XCircle } from "lucide-react";
 
 interface Event {
   id: string;
@@ -44,16 +36,27 @@ interface Event {
   organizer_id: string | null;
   is_approved: boolean;
   created_at: string;
+  booked_count: number;
 }
 
-interface Booking {
-  event_id: string;
+interface Stats {
+  totalUsers: number;
+  totalEvents: number;
+  pendingEvents: number;
+  approvedEvents: number;
+}
+
+interface ApiResponse {
+  events: Event[];
+  stats: Stats;
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
 }
 
 export default function AdminDashboard() {
   const [events, setEvents] = useState<Event[]>([]);
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
     totalEvents: 0,
     pendingEvents: 0,
@@ -62,76 +65,62 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<Event | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const eventsPerPage = 10;
 
-  const fetchData = async () => {
+  const fetchData = async (page: number) => {
     setLoading(true);
+    try {
+      const response = await fetch(
+        `/api/admin/events?page=${page}&limit=${eventsPerPage}`
+      );
+      const data: ApiResponse = await response.json();
 
-    // Fetch users count
-    const { count: usersCount } = await supabase
-      .from("profiles")
-      .select("*", { count: "exact", head: true });
-
-    // Fetch events
-    const { data: eventsData } = await supabase
-      .from("events")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    // Fetch bookings
-    const { data: bookingsData } = await supabase
-      .from("bookings")
-      .select("event_id");
-
-    if (eventsData) setEvents(eventsData);
-    if (bookingsData) setBookings(bookingsData);
-
-    // Calculate stats
-    setStats({
-      totalUsers: usersCount || 0,
-      totalEvents: eventsData?.length || 0,
-      pendingEvents: eventsData?.filter((e) => !e.is_approved).length || 0,
-      approvedEvents: eventsData?.filter((e) => e.is_approved).length || 0,
-    });
-
+      if (response.ok) {
+        setEvents(data.events);
+        setStats(data.stats);
+        setTotalPages(data.totalPages);
+        setCurrentPage(data.currentPage);
+      }
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData(1);
   }, []);
 
-  const getBookedCount = (eventId: string) => {
-    return bookings.filter((b) => b.event_id === eventId).length;
+  const handlePageChange = (page: number) => {
+    fetchData(page);
   };
 
   const handleDeleteEvent = async () => {
     if (!eventToDelete) return;
 
-    const { error } = await supabase
-      .from("events")
-      .delete()
-      .eq("id", eventToDelete.id);
-
-    if (!error) {
-      setEvents(events.filter((e) => e.id !== eventToDelete.id));
-      setStats({
-        ...stats,
-        totalEvents: stats.totalEvents - 1,
-        pendingEvents: eventToDelete.is_approved
-          ? stats.pendingEvents
-          : stats.pendingEvents - 1,
-        approvedEvents: eventToDelete.is_approved
-          ? stats.approvedEvents - 1
-          : stats.approvedEvents,
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/admin/events/${eventToDelete.id}`, {
+        method: "DELETE",
       });
-    }
 
-    setDeleteDialogOpen(false);
-    setEventToDelete(null);
+      if (response.ok) {
+        // Refetch current page data
+        fetchData(currentPage);
+        setDeleteDialogOpen(false);
+        setEventToDelete(null);
+        setShowDeleteSuccess(true);
+      }
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
+    setDeleting(false);
   };
 
   const formatDate = (dateString: string) => {
@@ -143,12 +132,28 @@ export default function AdminDashboard() {
     });
   };
 
-  // Pagination logic
-  const totalPages = Math.ceil(events.length / eventsPerPage);
-  const startIndex = (currentPage - 1) * eventsPerPage;
-  const paginatedEvents = events.slice(startIndex, startIndex + eventsPerPage);
+  const formatTime = (timeString: string) => {
+    // Parse the time and format it nicely
+    if (!timeString) return "";
 
-  if (loading) {
+    // If time contains a range (e.g., "12:25 - 14:40"), format both parts
+    if (timeString.includes("-")) {
+      const [start, end] = timeString.split("-").map((t) => t.trim());
+      return `${formatSingleTime(start)} - ${formatSingleTime(end)}`;
+    }
+
+    return formatSingleTime(timeString);
+  };
+
+  const formatSingleTime = (time: string) => {
+    const [hours, minutes] = time.split(":");
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? "pm" : "am";
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes}${ampm}`;
+  };
+
+  if (loading && events.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-white">Loading dashboard...</div>
@@ -160,12 +165,11 @@ export default function AdminDashboard() {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-white italic">
+        <h1 className="text-3xl sm:text-4xl font-bold text-white">
           Event Management
         </h1>
         <Link href="/events/create">
-          <Button className="bg-primary-500 text-black hover:bg-primary-400 gap-2">
-            <Plus className="w-4 h-4" />
+          <Button className="bg-[#00D4AA] text-black hover:bg-[#00C49A] font-semibold px-6 py-2 rounded-lg">
             Add New Event
           </Button>
         </Link>
@@ -178,7 +182,7 @@ export default function AdminDashboard() {
             <CardTitle className="text-sm font-medium text-gray-400">
               Total Users
             </CardTitle>
-            <Users className="w-4 h-4 text-primary-500" />
+            <Users className="w-8 h-8 text-white" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">
@@ -192,7 +196,7 @@ export default function AdminDashboard() {
             <CardTitle className="text-sm font-medium text-gray-400">
               Total Events
             </CardTitle>
-            <Calendar className="w-4 h-4 text-primary-500" />
+            <Calendar className="w-8 h-8 text-white" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">
@@ -206,7 +210,7 @@ export default function AdminDashboard() {
             <CardTitle className="text-sm font-medium text-gray-400">
               Pending Approval
             </CardTitle>
-            <XCircle className="w-4 h-4 text-yellow-500" />
+            <XCircle className="w-8 h-8 text-white" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-500">
@@ -220,7 +224,7 @@ export default function AdminDashboard() {
             <CardTitle className="text-sm font-medium text-gray-400">
               Approved Events
             </CardTitle>
-            <CheckCircle className="w-4 h-4 text-green-500" />
+            <CheckCircle className="w-8 h-8 text-white" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-500">
@@ -231,26 +235,30 @@ export default function AdminDashboard() {
       </div>
 
       {/* Events Table */}
-      <div className="rounded-lg border border-dark-300 overflow-hidden bg-dark-200/30 backdrop-blur-sm">
+      <div className="rounded-lg overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="border-dark-300 hover:bg-transparent">
-              <TableHead className="text-gray-400 font-medium">
+            <TableRow className="border-b border-dark-300/50 hover:bg-transparent">
+              <TableHead className="text-gray-400 font-medium text-sm py-4">
                 Events
               </TableHead>
-              <TableHead className="text-gray-400 font-medium">
+              <TableHead className="text-gray-400 font-medium text-sm">
                 Location
               </TableHead>
-              <TableHead className="text-gray-400 font-medium">Date</TableHead>
-              <TableHead className="text-gray-400 font-medium">Time</TableHead>
-              <TableHead className="text-gray-400 font-medium">
+              <TableHead className="text-gray-400 font-medium text-sm">
+                Date
+              </TableHead>
+              <TableHead className="text-gray-400 font-medium text-sm">
+                Time
+              </TableHead>
+              <TableHead className="text-gray-400 font-medium text-sm">
                 Booked spot
               </TableHead>
-              <TableHead className="text-gray-400 font-medium text-right"></TableHead>
+              <TableHead className="text-gray-400 font-medium text-sm text-right"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedEvents.length === 0 ? (
+            {events.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={6}
@@ -260,20 +268,20 @@ export default function AdminDashboard() {
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedEvents.map((event) => (
+              events.map((event) => (
                 <TableRow
                   key={event.id}
-                  className="border-dark-300 hover:bg-dark-300/50"
+                  className="border-b border-dark-300/30 hover:bg-dark-300/20"
                 >
-                  <TableCell>
+                  <TableCell className="py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-dark-300 flex-shrink-0">
+                      <div className="w-14 h-10 rounded-lg overflow-hidden bg-dark-300 flex-shrink-0">
                         {event.image && (
                           <Image
                             src={event.image}
                             alt={event.title}
-                            width={48}
-                            height={48}
+                            width={56}
+                            height={40}
                             className="w-full h-full object-cover"
                           />
                         )}
@@ -289,14 +297,16 @@ export default function AdminDashboard() {
                   <TableCell className="text-gray-300">
                     {formatDate(event.date)}
                   </TableCell>
-                  <TableCell className="text-gray-300">{event.time}</TableCell>
                   <TableCell className="text-gray-300">
-                    {getBookedCount(event.id)}
+                    {formatTime(event.time)}
+                  </TableCell>
+                  <TableCell className="text-gray-300">
+                    {event.booked_count}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-4">
                       <Link href={`/events/${event.slug}/edit`}>
-                        <button className="text-primary-500 hover:text-primary-400 text-sm font-medium">
+                        <button className="text-[#00D4AA] hover:text-[#00C49A] text-sm font-medium">
                           Edit
                         </button>
                       </Link>
@@ -323,9 +333,9 @@ export default function AdminDashboard() {
         <div className="flex items-center justify-between mt-6">
           <Button
             variant="outline"
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="border-dark-300 text-white hover:bg-dark-300"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1 || loading}
+            className="border-dark-300 bg-dark-300/50 text-white hover:bg-dark-300 px-6"
           >
             Previous
           </Button>
@@ -334,9 +344,9 @@ export default function AdminDashboard() {
           </span>
           <Button
             variant="outline"
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            className="border-dark-300 text-white hover:bg-dark-300"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages || loading}
+            className="border-dark-300 bg-dark-300/50 text-white hover:bg-dark-300 px-6"
           >
             Next
           </Button>
@@ -358,6 +368,7 @@ export default function AdminDashboard() {
               variant="outline"
               onClick={() => setDeleteDialogOpen(false)}
               className="border-dark-300 text-white hover:bg-dark-300"
+              disabled={deleting}
             >
               Cancel
             </Button>
@@ -365,12 +376,22 @@ export default function AdminDashboard() {
               variant="destructive"
               onClick={handleDeleteEvent}
               className="bg-red-600 hover:bg-red-700"
+              disabled={deleting}
             >
-              Delete
+              {deleting ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Success Dialog */}
+      <SuccessDialog
+        open={showDeleteSuccess}
+        onClose={() => setShowDeleteSuccess(false)}
+        title="Event Deleted!"
+        message="The event has been successfully removed."
+        buttonText="Continue"
+      />
     </div>
   );
 }
