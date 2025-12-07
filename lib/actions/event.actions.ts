@@ -53,7 +53,7 @@ export const getAllEvents = async () => {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error in getAllEvents:", error);
+      console.error("Error in getAllEvents:", JSON.stringify(error, null, 2));
       return [];
     }
 

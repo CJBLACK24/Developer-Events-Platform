@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/providers/AuthProvider";
+import supabase from "@/lib/supabase";
+import { generateSlug, normalizeDate, normalizeTime } from "@/lib/utils";
 
 const eventTypes = [
   "Conference",
@@ -15,6 +18,7 @@ const eventTypes = [
 
 const CreateEventForm = () => {
   const router = useRouter();
+  const { user, profile, loading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -33,6 +37,29 @@ const CreateEventForm = () => {
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login?redirect=/events/create");
+    }
+  }, [user, loading, router]);
+
+  if (loading) return <p className="text-center p-10">Loading...</p>;
+
+  if (!user || (profile?.role !== "organizer" && profile?.role !== "admin")) {
+    return (
+      <div className="text-center p-10 border border-red-500 rounded-xl bg-red-900/20">
+        <h2 className="text-xl font-bold text-red-500">Access Denied</h2>
+        <p className="mt-2">
+          You must be an Verified Organizer to create events.
+        </p>
+        <p className="text-sm mt-4 text-gray-400">
+          (For this demo, ask the admin to upgrade your role or run the SQL with
+          Admin/Organizer role setup)
+        </p>
+      </div>
+    );
+  }
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -60,30 +87,32 @@ const CreateEventForm = () => {
     setIsSubmitting(true);
 
     try {
-      const submitFormData = new FormData();
+      let imageUrl = "";
 
-      // Generate slug from title
-      const slug = formData.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
+      // 1. Upload Image
+      if (imageFile) {
+        const uploadFormData = new FormData();
+        uploadFormData.append("image", imageFile);
 
-      submitFormData.append("title", formData.title);
-      submitFormData.append("slug", slug);
-      submitFormData.append("date", formData.date);
-      submitFormData.append("time", formData.time);
-      submitFormData.append("location", formData.location);
-      submitFormData.append("venue", formData.venue);
-      submitFormData.append("mode", formData.mode);
-      submitFormData.append("description", formData.description);
-      submitFormData.append(
-        "overview",
-        formData.overview || formData.description
-      );
-      submitFormData.append("audience", formData.audience || "Developers");
-      submitFormData.append("organizer", formData.organizer || "Community");
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: uploadFormData,
+        });
 
-      // Parse tags and agenda as JSON arrays
+        if (!uploadRes.ok) throw new Error("Image upload failed");
+        const uploadData = await uploadRes.json();
+        imageUrl = uploadData.url;
+      } else {
+        alert("Please upload an image");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // 2. Prepare Data
+      const slug = generateSlug(formData.title);
+      // Ensure unique slug (simple append random string if needed, or let DB fail)
+      // For UX, checking first is better, but keep it simple for now.
+
       const tagsArray = formData.tags
         .split(",")
         .map((tag) => tag.trim())
@@ -93,29 +122,36 @@ const CreateEventForm = () => {
         .map((item) => item.trim())
         .filter(Boolean);
 
-      submitFormData.append("tags", JSON.stringify(tagsArray));
-      submitFormData.append("agenda", JSON.stringify(agendaArray));
+      const formattedDate = normalizeDate(formData.date);
+      const formattedTime = normalizeTime(formData.time);
 
-      if (imageFile) {
-        submitFormData.append("image", imageFile);
-      }
-
-      const response = await fetch("/api/events", {
-        method: "POST",
-        body: submitFormData,
+      // 3. Insert into Supabase
+      const { error } = await supabase.from("events").insert({
+        title: formData.title,
+        slug: slug,
+        date: formattedDate,
+        time: formattedTime,
+        location: formData.location,
+        venue: formData.venue,
+        mode: formData.mode,
+        description: formData.description,
+        overview: formData.overview || formData.description,
+        audience: formData.audience || "Developers",
+        organizer: formData.organizer || "Community", // Display name
+        tags: tagsArray,
+        agenda: agendaArray,
+        image: imageUrl,
+        organizer_id: user.id, // Link to RBAC user
+        is_approved: true, // Auto-approve for now, or false if you want approval flow
       });
 
-      if (response.ok) {
-        router.push("/");
-        router.refresh();
-      } else {
-        const error = await response.json();
-        console.error("Failed to create event:", error);
-        alert("Failed to create event: " + error.message);
-      }
+      if (error) throw error;
+
+      router.push("/");
+      router.refresh();
     } catch (error) {
       console.error("Error creating event:", error);
-      alert("An error occurred. Please try again.");
+      alert("Failed to create event. " + (error as Error).message);
     } finally {
       setIsSubmitting(false);
     }

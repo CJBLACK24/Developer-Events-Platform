@@ -1,0 +1,18 @@
+export const LogoIcon = () => (
+  <svg
+    width="32"
+    height="32"
+    viewBox="0 0 32 32"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="32" height="32" rx="8" fill="#5DFECA" />
+    <path
+      d="M16 8L24 16L16 24L8 16L16 8Z"
+      stroke="#0B0E14"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
