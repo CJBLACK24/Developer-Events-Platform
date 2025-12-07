@@ -169,7 +169,7 @@ export default function AdminDashboard() {
           Event Management
         </h1>
         <Link href="/events/create">
-          <Button className="bg-[#00D4AA] text-black hover:bg-[#00C49A] font-semibold px-6 py-2 rounded-lg">
+          <Button className="bg-[#59DECA] text-black hover:bg-[#4ac9b9] font-semibold px-6 py-2 rounded-lg">
             Add New Event
           </Button>
         </Link>
@@ -177,7 +177,7 @@ export default function AdminDashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="bg-dark-200/50 border-dark-300 backdrop-blur-sm">
+        <Card className="bg-[#182830] border-[#182830] rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-400">
               Total Users
@@ -191,7 +191,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-200/50 border-dark-300 backdrop-blur-sm">
+        <Card className="bg-[#182830] border-[#182830] rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-400">
               Total Events
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-200/50 border-dark-300 backdrop-blur-sm">
+        <Card className="bg-[#182830] border-[#182830] rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-400">
               Pending Approval
@@ -219,7 +219,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-dark-200/50 border-dark-300 backdrop-blur-sm">
+        <Card className="bg-[#182830] border-[#182830] rounded-xl">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-400">
               Approved Events
@@ -235,26 +235,28 @@ export default function AdminDashboard() {
       </div>
 
       {/* Events Table */}
-      <div className="rounded-lg overflow-hidden">
+      <div className="rounded-xl overflow-hidden bg-[#0c151a] border border-[#182830]">
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-dark-300/50 hover:bg-transparent">
-              <TableHead className="text-gray-400 font-medium text-sm py-4">
+            <TableRow className="border-b border-[#182830] hover:bg-transparent bg-[#182830]">
+              <TableHead className="text-gray-400 font-medium text-sm py-4 border-r border-[#182830] text-center">
                 Events
               </TableHead>
-              <TableHead className="text-gray-400 font-medium text-sm">
+              <TableHead className="text-gray-400 font-medium text-sm border-r border-[#182830] text-center">
                 Location
               </TableHead>
-              <TableHead className="text-gray-400 font-medium text-sm">
+              <TableHead className="text-gray-400 font-medium text-sm border-r border-[#182830] text-center">
                 Date
               </TableHead>
-              <TableHead className="text-gray-400 font-medium text-sm">
+              <TableHead className="text-gray-400 font-medium text-sm border-r border-[#182830] text-center">
                 Time
               </TableHead>
-              <TableHead className="text-gray-400 font-medium text-sm">
+              <TableHead className="text-gray-400 font-medium text-sm border-r border-[#182830] text-center">
                 Booked spot
               </TableHead>
-              <TableHead className="text-gray-400 font-medium text-sm text-right"></TableHead>
+              <TableHead className="text-gray-400 font-medium text-sm text-center">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -271,11 +273,11 @@ export default function AdminDashboard() {
               events.map((event) => (
                 <TableRow
                   key={event.id}
-                  className="border-b border-dark-300/30 hover:bg-dark-300/20"
+                  className="border-b border-[#182830] hover:bg-[#0c151a] bg-[#0c151a]"
                 >
-                  <TableCell className="py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-14 h-10 rounded-lg overflow-hidden bg-dark-300 flex-shrink-0">
+                  <TableCell className="py-4 border-r border-[#182830]">
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="w-14 h-10 rounded-lg overflow-hidden bg-dark-300 shrink-0">
                         {event.image && (
                           <Image
                             src={event.image}
@@ -291,22 +293,22 @@ export default function AdminDashboard() {
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-gray-300">
+                  <TableCell className="text-gray-300 border-r border-[#182830] text-center">
                     {event.location}
                   </TableCell>
-                  <TableCell className="text-gray-300">
+                  <TableCell className="text-gray-300 border-r border-[#182830] text-center">
                     {formatDate(event.date)}
                   </TableCell>
-                  <TableCell className="text-gray-300">
+                  <TableCell className="text-gray-300 border-r border-[#182830] text-center">
                     {formatTime(event.time)}
                   </TableCell>
-                  <TableCell className="text-gray-300">
+                  <TableCell className="text-gray-300 border-r border-[#182830] text-center">
                     {event.booked_count}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-4">
+                  <TableCell className="text-center">
+                    <div className="flex items-center justify-center gap-4">
                       <Link href={`/events/${event.slug}/edit`}>
-                        <button className="text-[#00D4AA] hover:text-[#00C49A] text-sm font-medium">
+                        <button className="text-[#59DECA] hover:text-[#4ac9b9] text-sm font-medium">
                           Edit
                         </button>
                       </Link>
@@ -315,7 +317,7 @@ export default function AdminDashboard() {
                           setEventToDelete(event);
                           setDeleteDialogOpen(true);
                         }}
-                        className="text-red-400 hover:text-red-300 text-sm font-medium"
+                        className="text-white hover:text-gray-300 text-sm font-medium"
                       >
                         Delete
                       </button>
@@ -335,18 +337,18 @@ export default function AdminDashboard() {
             variant="outline"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1 || loading}
-            className="border-dark-300 bg-dark-300/50 text-white hover:bg-dark-300 px-6"
+            className="border-[#182830] bg-[#0c151a] text-white hover:bg-[#132029] px-6 rounded-lg"
           >
             Previous
           </Button>
-          <span className="text-gray-400 text-sm">
+          <span className="text-white">
             Page {currentPage} of {totalPages}
           </span>
           <Button
             variant="outline"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages || loading}
-            className="border-dark-300 bg-dark-300/50 text-white hover:bg-dark-300 px-6"
+            className="border-[#182830] bg-[#0c151a] text-white hover:bg-[#132029] px-6 rounded-lg"
           >
             Next
           </Button>

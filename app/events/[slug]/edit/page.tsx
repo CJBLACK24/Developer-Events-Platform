@@ -8,6 +8,7 @@ import supabase from "@/lib/supabase";
 import { generateSlug, normalizeDate, normalizeTime } from "@/lib/utils";
 import Link from "next/link";
 import { SuccessDialog } from "@/components/ui/success-dialog";
+import { Clock } from "lucide-react";
 
 const eventTypes = [
   "Conference",
@@ -51,6 +52,8 @@ export default function EditEventPage() {
     title: "",
     date: "",
     time: "",
+    startTime: "",
+    endTime: "",
     location: "",
     venue: "",
     eventType: "",
@@ -84,10 +87,41 @@ export default function EditEventPage() {
       }
 
       setEvent(data);
+
+      // Parse time string (e.g. "12:25pm - 2:40pm")
+      let startTime = "";
+      let endTime = "";
+
+      // Actually, since input[type="time"] expects HH:mm (24h), and we store "12:25pm", parsing is needed.
+      // Let's simpler approach: if we can't easily parse, just let user re-enter or keep as is?
+      // User request implies updating the field.
+      // I'll add a helper helper to convert "12:25pm" -> "12:25" (24h)
+
+      const convertTo24Hour = (timeStr: string) => {
+        const [time, modifier] = timeStr.split(/(am|pm)/i);
+        let [hours, minutes] = time.split(":");
+        if (!hours || !minutes) return "";
+        if (modifier.toLowerCase() === "pm" && hours !== "12") {
+          hours = String(parseInt(hours, 10) + 12);
+        }
+        if (modifier.toLowerCase() === "am" && hours === "12") {
+          hours = "00";
+        }
+        return `${hours}:${minutes}`;
+      };
+
+      if (data.time && data.time.includes(" - ")) {
+        const parts = data.time.split(" - ");
+        startTime = convertTo24Hour(parts[0]);
+        endTime = convertTo24Hour(parts[1]);
+      }
+
       setFormData({
         title: data.title || "",
         date: data.date || "",
         time: data.time || "",
+        startTime: startTime,
+        endTime: endTime,
         location: data.location || "",
         venue: data.venue || "",
         eventType: data.event_type || "",
@@ -193,7 +227,9 @@ export default function EditEventPage() {
         .filter(Boolean);
 
       const formattedDate = normalizeDate(formData.date);
-      const formattedTime = normalizeTime(formData.time);
+      const timeString = `${normalizeTime(
+        formData.startTime
+      )} - ${normalizeTime(formData.endTime)}`;
 
       // 3. Update in Supabase
       const { error } = await supabase
@@ -202,7 +238,7 @@ export default function EditEventPage() {
           title: formData.title,
           slug: newSlug,
           date: formattedDate,
-          time: formattedTime,
+          time: timeString,
           location: formData.location,
           venue: formData.venue,
           mode: formData.mode,
@@ -280,16 +316,32 @@ export default function EditEventPage() {
         {/* Event Time */}
         <div className="form-group">
           <label htmlFor="time">Event Time</label>
-          <div className="input-with-icon">
-            <Image src="/icons/clock.svg" alt="clock" width={16} height={16} />
-            <input
-              type="time"
-              id="time"
-              name="time"
-              value={formData.time}
-              onChange={handleInputChange}
-              required
-            />
+          <div className="flex gap-4 items-center">
+            <div className="input-with-icon flex-1">
+              <Clock className="w-5 h-5 text-[#59DECA]" />
+              <input
+                type="time"
+                id="startTime"
+                name="startTime"
+                value={formData.startTime || ""}
+                onChange={handleInputChange}
+                required
+                className="w-full bg-transparent border-none outline-none text-white placeholder-gray-500"
+              />
+            </div>
+            <span className="text-gray-400 font-medium">to</span>
+            <div className="input-with-icon flex-1">
+              <Clock className="w-5 h-5 text-[#59DECA]" />
+              <input
+                type="time"
+                id="endTime"
+                name="endTime"
+                value={formData.endTime || ""}
+                onChange={handleInputChange}
+                required
+                className="w-full bg-transparent border-none outline-none text-white placeholder-gray-500"
+              />
+            </div>
           </div>
         </div>
 

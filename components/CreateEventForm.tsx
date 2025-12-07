@@ -7,6 +7,7 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import supabase from "@/lib/supabase";
 import { generateSlug, normalizeDate, normalizeTime } from "@/lib/utils";
 import { SuccessDialog } from "@/components/ui/success-dialog";
+import { Clock } from "lucide-react";
 
 const eventTypes = [
   "Conference",
@@ -24,6 +25,8 @@ const CreateEventForm = () => {
   const [formData, setFormData] = useState({
     title: "",
     date: "",
+    startTime: "",
+    endTime: "",
     time: "",
     location: "",
     venue: "",
@@ -125,14 +128,16 @@ const CreateEventForm = () => {
         .filter(Boolean);
 
       const formattedDate = normalizeDate(formData.date);
-      const formattedTime = normalizeTime(formData.time);
+      const timeString = `${normalizeTime(
+        formData.startTime
+      )} - ${normalizeTime(formData.endTime)}`;
 
       // 3. Insert into Supabase
       const { error } = await supabase.from("events").insert({
         title: formData.title,
         slug: slug,
         date: formattedDate,
-        time: formattedTime,
+        time: timeString,
         location: formData.location,
         venue: formData.venue,
         mode: formData.mode,
@@ -195,19 +200,34 @@ const CreateEventForm = () => {
         </div>
       </div>
 
-      {/* Event Time */}
       <div className="form-group">
-        <label htmlFor="time">Event Time</label>
-        <div className="input-with-icon">
-          <Image src="/icons/clock.svg" alt="clock" width={16} height={16} />
-          <input
-            type="time"
-            id="time"
-            name="time"
-            value={formData.time}
-            onChange={handleInputChange}
-            required
-          />
+        <label>Event Time</label>
+        <div className="flex gap-4 items-center">
+          <div className="input-with-icon flex-1">
+            <Clock className="w-5 h-5 text-[#59DECA]" />
+            <input
+              type="time"
+              id="startTime"
+              name="startTime"
+              value={formData.startTime || ""}
+              onChange={handleInputChange}
+              required
+              className="w-full bg-transparent border-none outline-none text-white placeholder-gray-500"
+            />
+          </div>
+          <span className="text-gray-400 font-medium">to</span>
+          <div className="input-with-icon flex-1">
+            <Clock className="w-5 h-5 text-[#59DECA]" />
+            <input
+              type="time"
+              id="endTime"
+              name="endTime"
+              value={formData.endTime || ""}
+              onChange={handleInputChange}
+              required
+              className="w-full bg-transparent border-none outline-none text-white placeholder-gray-500"
+            />
+          </div>
         </div>
       </div>
 
