@@ -49,7 +49,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-dark-100/80 backdrop-blur-md border-b border-dark-300">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-dark-100/80 backdrop-blur-md border-b border-dark-200">
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo - Left */}
         <Link href="/" className="flex items-center gap-2">
@@ -99,12 +99,12 @@ const Navbar = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-dark-100 rounded-full">
-                  <Avatar className="h-9 w-9 border-2 border-dark-300 hover:border-primary-500 transition-colors">
+                  <Avatar className="h-9 w-9 border-2 border-dark-200 hover:border-primary-500 transition-colors">
                     <AvatarImage
                       src={profile?.avatar_url}
                       alt={profile?.full_name || ""}
                     />
-                    <AvatarFallback className="bg-dark-300 text-white text-sm">
+                    <AvatarFallback className="bg-dark-200 text-white text-sm">
                       {getInitials(profile?.full_name, user.email)}
                     </AvatarFallback>
                   </Avatar>
@@ -112,7 +112,7 @@ const Navbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-64 bg-dark-200 border-dark-300 text-white"
+                className="w-64 bg-dark-200 border-dark-200 text-white"
               >
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-2">
@@ -132,10 +132,10 @@ const Navbar = () => {
                     </Badge>
                   </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-dark-300" />
+                <DropdownMenuSeparator className="bg-dark-100" />
                 <DropdownMenuItem
                   asChild
-                  className="cursor-pointer hover:bg-dark-300"
+                  className="cursor-pointer hover:bg-dark-100"
                 >
                   <Link href="/settings" className="flex items-center gap-2">
                     <User className="w-4 h-4" />
@@ -144,17 +144,17 @@ const Navbar = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   asChild
-                  className="cursor-pointer hover:bg-dark-300"
+                  className="cursor-pointer hover:bg-dark-100"
                 >
                   <Link href="/settings" className="flex items-center gap-2">
                     <Settings className="w-4 h-4" />
                     <span>Settings</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-dark-300" />
+                <DropdownMenuSeparator className="bg-dark-100" />
                 <DropdownMenuItem
                   onSelect={() => signOut()}
-                  className="cursor-pointer hover:bg-dark-300 text-red-400 focus:text-red-400 focus:bg-dark-300"
+                  className="cursor-pointer hover:bg-dark-100 text-red-400 focus:text-red-400 focus:bg-dark-100"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
                   <span>Log out</span>
