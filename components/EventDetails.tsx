@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { IEvent } from "@/database";
 import {
   getEventBySlug,
   getSimilarEventsBySlug,
@@ -7,7 +6,25 @@ import {
 import Image from "next/image";
 import BookEvent from "@/components/BookEvent";
 import EventCard from "@/components/EventCard";
-import { EventViewTracker } from "@/components/analytics/EventTracking";
+
+// Temporary interface until we have a shared types file
+interface IEvent {
+  _id: string;
+  title: string;
+  slug: string;
+  description: string;
+  image: string;
+  date: string;
+  time: string;
+  location: string;
+  venue: string;
+  mode: string;
+  tags: string[];
+  overview: string;
+  agenda: string[];
+  audience: string;
+  organizer: string;
+}
 
 const formatMode = (mode: string) => {
   switch (mode) {
@@ -51,14 +68,6 @@ const EventDetails = async ({ params }: { params: Promise<string> }) => {
 
   return (
     <section className="event-details-page">
-      {/* PostHog event view tracking */}
-      <EventViewTracker
-        eventId={event._id}
-        eventSlug={slug}
-        eventTitle={title}
-        eventTags={tags}
-      />
-
       {/* Header Section */}
       <div className="event-header">
         <h1>{title}</h1>

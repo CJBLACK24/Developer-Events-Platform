@@ -1,40 +1,64 @@
 "use server";
 
-import Event, { IEvent } from "@/database/event.model";
-import connectDB from "@/lib/mongodb";
+import supabase from "@/lib/supabase";
 
-export const getSimilarEventsBySlug = async (
-  slug: string
-): Promise<IEvent[]> => {
+// Helper to map Supabase snake_case to frontend camelCase
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mapEvent = (event: any) => ({
+  ...event,
+  _id: event.id, // Map Supabase ID to _id for frontend compatibility
+  createdAt: event.created_at,
+  updatedAt: event.updated_at || event.created_at,
+});
+
+export const getSimilarEventsBySlug = async (slug: string) => {
   try {
-    await connectDB();
-    const event = await Event.findOne({ slug });
+    // 1. Get the current event to find its tags
+    const { data: currentEvent } = await supabase
+      .from("events")
+      .select("tags, id")
+      .eq("slug", slug)
+      .single();
 
-    const similarEvents = await Event.find({
-      _id: { $ne: event._id },
-      tags: { $in: event.tags },
-    }).lean();
-    return JSON.parse(JSON.stringify(similarEvents));
-  } catch {
+    if (!currentEvent) return [];
+
+    // 2. Find events with overlapping tags, excluding the current event
+    const { data: similarEvents, error } = await supabase
+      .from("events")
+      .select("*")
+      .overlaps("tags", currentEvent.tags || [])
+      .neq("id", currentEvent.id)
+      .limit(3);
+
+    if (error) {
+      console.error("Error fetching similar events:", error);
+      return [];
+    }
+
+    return similarEvents.map(mapEvent);
+  } catch (error) {
+    console.error("Unexpected error in getSimilarEventsBySlug:", error);
     return [];
   }
 };
 
 export const getAllEvents = async () => {
   try {
-    console.log("Starting getAllEvents...");
-    const mongooseInstance = await connectDB();
-    console.log(
-      `Connected to DB, state: ${mongooseInstance.connection.readyState}, fetching events...`
-    );
-    if (mongooseInstance.connection.db) {
-      await mongooseInstance.connection.db.admin().ping();
-      console.log("DB Ping successful");
-    }
-    const events = await Event.find().sort({ createdAt: -1 }).lean();
-    console.log(`Events fetched: ${events.length}`);
+    console.log("Fetching events from Supabase...");
 
-    return JSON.parse(JSON.stringify(events));
+    // Fetch all events sorted by creation date
+    const { data: events, error } = await supabase
+      .from("events")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error in getAllEvents:", error);
+      return [];
+    }
+
+    console.log(`Events fetched: ${events.length}`);
+    return events.map(mapEvent);
   } catch (e) {
     console.error("Error in getAllEvents:", e);
     return [];
@@ -43,9 +67,18 @@ export const getAllEvents = async () => {
 
 export const getEventBySlug = async (slug: string) => {
   try {
-    await connectDB();
-    const event = await Event.findOne({ slug });
-    return JSON.parse(JSON.stringify(event));
+    const { data: event, error } = await supabase
+      .from("events")
+      .select("*")
+      .eq("slug", slug)
+      .single();
+
+    if (error) {
+      console.error(`Error fetching event by slug ${slug}:`, error);
+      return null;
+    }
+
+    return mapEvent(event);
   } catch (e) {
     console.error(e);
     return null;
