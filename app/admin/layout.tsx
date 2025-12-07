@@ -3,6 +3,7 @@
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Link from "next/link";
 
 export default function AdminLayout({
   children,
@@ -16,7 +17,7 @@ export default function AdminLayout({
     if (!loading) {
       if (!user) {
         router.push("/sign-in");
-      } else if (profile?.role !== "admin") {
+      } else if (profile?.role !== "admin" && profile?.role !== "organizer") {
         router.push("/");
       }
     }
@@ -24,24 +25,30 @@ export default function AdminLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-dark-100">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-white">Loading...</div>
       </div>
     );
   }
 
-  if (!user || profile?.role !== "admin") {
+  if (!user || (profile?.role !== "admin" && profile?.role !== "organizer")) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-dark-100">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
           <p className="text-gray-400">
             You do not have permission to access this area.
           </p>
+          <Link
+            href="/"
+            className="text-primary-500 hover:underline mt-4 block"
+          >
+            Go back home
+          </Link>
         </div>
       </div>
     );
   }
 
-  return <div className="min-h-screen bg-dark-100">{children}</div>;
+  return <>{children}</>;
 }

@@ -35,13 +35,11 @@ DROP POLICY IF EXISTS "Anyone can view profiles" ON public.profiles;
 DROP POLICY IF EXISTS "All authenticated users can view profiles" ON public.profiles;
 
 -- 5. Create SIMPLE Profile Policies (avoiding recursion)
--- All authenticated users can read any profile (needed for admin dashboard)
 CREATE POLICY "All authenticated users can view profiles" 
   ON public.profiles FOR SELECT 
   TO authenticated
   USING (true);
 
--- Users can update their own profile
 CREATE POLICY "Users can update own profile" 
   ON public.profiles FOR UPDATE 
   USING (auth.uid() = id);
@@ -57,7 +55,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Drop trigger if exists and recreate
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
@@ -71,7 +68,7 @@ CREATE TRIGGER on_auth_user_created
 ALTER TABLE public.events ADD COLUMN IF NOT EXISTS organizer_id UUID REFERENCES auth.users(id);
 ALTER TABLE public.events ADD COLUMN IF NOT EXISTS is_approved BOOLEAN DEFAULT FALSE;
 
--- 8. Drop existing event policies
+-- 8. Drop ALL existing event policies
 DROP POLICY IF EXISTS "Public events are viewable by everyone" ON public.events;
 DROP POLICY IF EXISTS "Public Approved Events" ON public.events;
 DROP POLICY IF EXISTS "Organizers can view own events" ON public.events;
@@ -81,26 +78,24 @@ DROP POLICY IF EXISTS "Organizers can update own events" ON public.events;
 DROP POLICY IF EXISTS "Admins can update all events" ON public.events;
 DROP POLICY IF EXISTS "Anyone can view approved events" ON public.events;
 DROP POLICY IF EXISTS "Authenticated can view all events" ON public.events;
+DROP POLICY IF EXISTS "Authenticated can create events" ON public.events;
+DROP POLICY IF EXISTS "Authenticated can update events" ON public.events;
 
--- 9. Create SIMPLE Event Policies (avoiding recursion)
--- Anyone can view approved events (public)
+-- 9. Create SIMPLE Event Policies
 CREATE POLICY "Anyone can view approved events" 
   ON public.events FOR SELECT 
   USING (is_approved = true);
 
--- Authenticated users can view all events (for organizers/admins to manage)
 CREATE POLICY "Authenticated can view all events" 
   ON public.events FOR SELECT 
   TO authenticated
   USING (true);
 
--- Authenticated users can create events (role check happens in app)
 CREATE POLICY "Authenticated can create events" 
   ON public.events FOR INSERT 
   TO authenticated
   WITH CHECK (true);
 
--- Authenticated users can update events (role check happens in app)
 CREATE POLICY "Authenticated can update events" 
   ON public.events FOR UPDATE 
   TO authenticated
