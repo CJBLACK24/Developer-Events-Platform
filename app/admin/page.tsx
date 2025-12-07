@@ -172,11 +172,12 @@ export default function AdminDashboard() {
         <h1 className="text-3xl sm:text-4xl font-bold text-white">
           Event Management
         </h1>
-        <Link href="/events/create">
-          <Button className="bg-[#59DECA] text-black hover:bg-[#4ac9b9] font-semibold px-6 py-2 rounded-lg">
-            Add New Event
-          </Button>
-        </Link>
+        <Button
+          asChild
+          className="bg-[#59DECA] text-black hover:bg-[#4ac9b9] font-semibold px-6 py-2 rounded-lg"
+        >
+          <Link href="/events/create">Add New Event</Link>
+        </Button>
       </div>
 
       {/* Stats Cards */}
@@ -242,7 +243,7 @@ export default function AdminDashboard() {
       <div className="rounded-xl overflow-hidden bg-[#0c151a] border border-[#182830]">
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-[#182830] bg-[#182830]">
+            <TableRow className="border-b border-[#182830] bg-[#182830] hover:bg-[#20323b] transition-colors">
               <TableHead className="text-gray-400 font-medium text-sm py-4 border-r border-[#182830] text-center">
                 Events
               </TableHead>
@@ -277,7 +278,7 @@ export default function AdminDashboard() {
               events.map((event) => (
                 <TableRow
                   key={event.id}
-                  className="border-b border-[#182830] hover:bg-[#0c151a] bg-[#0c151a]"
+                  className="border-b border-[#182830] hover:bg-[#132029] bg-[#0c151a] transition-colors"
                 >
                   <TableCell className="py-4 border-r border-[#182830]">
                     <div className="flex items-center justify-center gap-3">

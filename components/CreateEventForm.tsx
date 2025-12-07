@@ -92,68 +92,67 @@ const CreateEventForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Mock submission to verify UI flow and avoid hanging on upload/db
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      let imageUrl = "";
 
-      // let imageUrl = "";
+      // 1. Upload Image
+      if (imageFile) {
+        const uploadFormData = new FormData();
+        uploadFormData.append("image", imageFile);
 
-      // // 1. Upload Image
-      // if (imageFile) {
-      //   const uploadFormData = new FormData();
-      //   uploadFormData.append("image", imageFile);
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: uploadFormData,
+        });
 
-      //   const uploadRes = await fetch("/api/upload", {
-      //     method: "POST",
-      //     body: uploadFormData,
-      //   });
+        if (!uploadRes.ok) throw new Error("Image upload failed");
+        const uploadData = await uploadRes.json();
+        imageUrl = uploadData.url;
+      } else {
+        alert("Please upload an image");
+        setIsSubmitting(false);
+        return;
+      }
 
-      //   if (!uploadRes.ok) throw new Error("Image upload failed");
-      //   const uploadData = await uploadRes.json();
-      //   imageUrl = uploadData.url;
-      // } else {
-      //   // For mock, we can just proceed without image or use a placeholder if needed
-      //   // alert("Please upload an image");
-      //   // setIsSubmitting(false);
-      //   // return;
-      // }
+      // 2. Prepare Data
+      const slug = generateSlug(formData.title);
+      // Ensure unique slug (simple append random string if needed, or let DB fail)
+      // For UX, checking first is better, but keep it simple for now.
 
-      // // 2. Prepare Data
-      // const slug = generateSlug(formData.title);
-      // const tagsArray = formData.tags
-      //   .split(",")
-      //   .map((tag) => tag.trim())
-      //   .filter(Boolean);
-      // const agendaArray = formData.agenda
-      //   .split("\n")
-      //   .map((item) => item.trim())
-      //   .filter(Boolean);
+      const tagsArray = formData.tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean);
+      const agendaArray = formData.agenda
+        .split("\n")
+        .map((item) => item.trim())
+        .filter(Boolean);
 
-      // const formattedDate = normalizeDate(formData.date);
-      // const timeString = `${normalizeTime(
-      //   formData.startTime
-      // )} - ${normalizeTime(formData.endTime)}`;
+      const formattedDate = normalizeDate(formData.date);
+      const timeString = `${normalizeTime(
+        formData.startTime
+      )} - ${normalizeTime(formData.endTime)}`;
 
-      // // 3. Insert into Supabase
-      // const { error } = await supabase.from("events").insert({
-      //   title: formData.title,
-      //   slug: slug,
-      //   date: formattedDate,
-      //   time: timeString,
-      //   location: formData.location,
-      //   venue: formData.venue,
-      //   mode: formData.mode,
-      //   description: formData.description,
-      //   overview: formData.overview || formData.description,
-      //   audience: formData.audience || "Developers",
-      //   organizer: formData.organizer || "Community",
-      //   tags: tagsArray,
-      //   agenda: agendaArray,
-      //   image: imageUrl,
-      //   organizer_id: user.id,
-      //   is_approved: true,
-      // });
+      // 3. Insert into Supabase
+      const { error } = await supabase.from("events").insert({
+        title: formData.title,
+        slug: slug,
+        date: formattedDate,
+        time: timeString,
+        location: formData.location,
+        venue: formData.venue,
+        mode: formData.mode,
+        description: formData.description,
+        overview: formData.overview || formData.description,
+        audience: formData.audience || "Developers",
+        organizer: formData.organizer || "Community", // Display name
+        tags: tagsArray,
+        agenda: agendaArray,
+        image: imageUrl,
+        organizer_id: user.id, // Link to RBAC user
+        is_approved: true, // Auto-approve for now, or false if you want approval flow
+      });
 
-      // if (error) throw error;
+      if (error) throw error;
 
       setShowSuccessDialog(true);
     } catch (error) {
