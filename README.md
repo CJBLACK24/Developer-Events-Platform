@@ -1,43 +1,114 @@
-# Developer Events Platform
+# DevEvent
 
-A modern, full-stack platform for discovering and managing developer events, built with **Next.js 16** and **React 19**.
+A modern developer events platform built with Next.js 16, React 19, and Supabase.
 
-## 🚀 Tech Stack
+## Tech Stack
 
-- **Framework:** Next.js 16 (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS 4
-- **Database:** MongoDB (via Mongoose)
-- **Analytics:** PostHog
-- **Media:** Cloudinary
+| Layer     | Technology                         |
+| --------- | ---------------------------------- |
+| Framework | Next.js 16 (App Router, Turbopack) |
+| Language  | TypeScript                         |
+| Database  | Supabase (PostgreSQL)              |
+| Auth      | Supabase Auth (Magic Link)         |
+| Styling   | Tailwind CSS 4, Shadcn UI          |
+| Media     | Cloudinary                         |
+| Email     | Nodemailer                         |
 
-## 🛠️ Getting Started
+## Features
 
-1. **Install dependencies:**
+- **Authentication** — Magic link sign-in/sign-up with email verification
+- **Role-Based Access Control** — Admin, Organizer, and Attendee roles
+- **Event Management** — Create, view, and book developer events
+- **Organizer Dashboard** — Event creation restricted to verified organizers
+- **Profile Management** — View/edit profile, change password
+- **Responsive Design** — Mobile-first, enterprise-grade UI
 
-   ```bash
-   npm install
-   ```
+## Project Structure
 
-2. **Environment Setup:**
-   Create a `.env` file in the root directory:
+```
+app/
+├── (auth)/              # Auth pages (sign-in, sign-up, forgot-password)
+├── api/                 # API routes (events, upload, auth callback)
+├── auth/callback/       # Supabase auth callback handler
+├── events/              # Event pages (detail, create)
+├── profile/             # User profile page
+└── page.tsx             # Home page
 
-   ```env
-   MONGODB_URI=your_mongodb_connection_string
-   NEXT_PUBLIC_BASE_URL=http://localhost:3000
-   CLOUDINARY_URL=your_cloudinary_url
-   NEXT_PUBLIC_POSTHOG_KEY=your_posthog_key
-   NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
-   ```
+components/
+├── providers/           # Context providers (AuthProvider)
+├── ui/                  # Shadcn UI components
+└── ...                  # Feature components
 
-3. **Run the development server:**
-   ```bash
-   npm run dev
-   ```
+lib/
+├── actions/             # Server actions (events, bookings)
+├── mail/                # Email utilities (Nodemailer)
+├── supabase.ts          # Supabase client
+└── utils.ts             # Helper functions
+```
 
-## ✨ Features
+## Getting Started
 
-- **Event Discovery:** Browse, search, and view detailed event information.
-- **Dynamic Routing:** SEO-friendly pages for individual events and categories.
-- **Booking System:** fast and secure signup flow for attendees.
-- **Performance:** Optimized with Next.js caching and Server Actions.
+### Prerequisites
+
+- Node.js 18+
+- Supabase project
+- Cloudinary account
+
+### Installation
+
+```bash
+npm install
+```
+
+### Environment Variables
+
+Create a `.env` file:
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your_supabase_anon_key
+
+# SMTP (Email)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email
+SMTP_PASS=your_app_password
+SMTP_FROM=your_email
+```
+
+### Database Setup
+
+Run the SQL scripts in your Supabase SQL Editor:
+
+1. `supabase_schema.sql` — Events and bookings tables
+2. `rbac_schema.sql` — Profiles, roles, and RLS policies
+
+### Development
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+## Authentication Flow
+
+```
+Sign Up → Magic Link Email → Callback → Profile Created → Home
+Sign In → Magic Link Email → Callback → Session Restored → Home
+```
+
+## Role Permissions
+
+| Action            | Attendee | Organizer | Admin |
+| ----------------- | -------- | --------- | ----- |
+| View Events       | ✓        | ✓         | ✓     |
+| Book Events       | ✓        | ✓         | ✓     |
+| Create Events     | ✗        | ✓         | ✓     |
+| Manage Own Events | ✗        | ✓         | ✓     |
+| Approve Events    | ✗        | ✗         | ✓     |
+
+## License
+
+MIT
