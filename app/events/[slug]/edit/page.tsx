@@ -317,8 +317,10 @@ export default function EditEventPage() {
         <div className="form-group">
           <label htmlFor="time">Event Time</label>
           <div className="flex gap-4 items-center">
-            <div className="input-with-icon flex-1">
-              <Clock className="w-5 h-5 text-[#59DECA]" />
+            <div className="relative flex-1 group">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                <Clock className="w-5 h-5 text-white group-hover:text-[#59DECA] transition-colors duration-200" />
+              </div>
               <input
                 type="time"
                 id="startTime"
@@ -326,12 +328,14 @@ export default function EditEventPage() {
                 value={formData.startTime || ""}
                 onChange={handleInputChange}
                 required
-                className="w-full bg-transparent border-none outline-none text-white placeholder-gray-500"
+                className="w-full bg-dark-200 text-white rounded-lg pl-12 pr-4 py-3 border border-dark-200 focus:border-primary focus:outline-none transition-colors"
               />
             </div>
             <span className="text-gray-400 font-medium">to</span>
-            <div className="input-with-icon flex-1">
-              <Clock className="w-5 h-5 text-[#59DECA]" />
+            <div className="relative flex-1 group">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                <Clock className="w-5 h-5 text-white group-hover:text-[#59DECA] transition-colors duration-200" />
+              </div>
               <input
                 type="time"
                 id="endTime"
@@ -339,7 +343,7 @@ export default function EditEventPage() {
                 value={formData.endTime || ""}
                 onChange={handleInputChange}
                 required
-                className="w-full bg-transparent border-none outline-none text-white placeholder-gray-500"
+                className="w-full bg-dark-200 text-white rounded-lg pl-12 pr-4 py-3 border border-dark-200 focus:border-primary focus:outline-none transition-colors"
               />
             </div>
           </div>
