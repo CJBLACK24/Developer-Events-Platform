@@ -27,12 +27,16 @@ export const getAllEvents = async () => {
     console.log(
       `Connected to DB, state: ${mongooseInstance.connection.readyState}, fetching events...`
     );
-    const events = await Event.find().sort({ createdAt: -1 }).maxTimeMS(5000);
+    if (mongooseInstance.connection.db) {
+      await mongooseInstance.connection.db.admin().ping();
+      console.log("DB Ping successful");
+    }
+    const events = await Event.find().sort({ createdAt: -1 }).lean();
     console.log(`Events fetched: ${events.length}`);
 
     return JSON.parse(JSON.stringify(events));
   } catch (e) {
-    console.error(e);
+    console.error("Error in getAllEvents:", e);
     return [];
   }
 };
