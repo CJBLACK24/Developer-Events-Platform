@@ -1,12 +1,13 @@
 "use client";
 
-import { LogoIcon } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import supabase from "@/lib/supabase";
+import { ArrowLeft } from "lucide-react";
 
 export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
@@ -48,104 +49,129 @@ export default function SignUpPage() {
   };
 
   return (
-    <section className="flex min-h-screen bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-muted m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5 dark:[--color-muted:var(--color-zinc-900)]"
-      >
-        <div className="bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6">
+    <div className="w-full h-screen lg:grid lg:grid-cols-2 overflow-hidden">
+      {/* Left Side: Form */}
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-black text-white relative">
+        {/* Back Button */}
+        <Link
+          href="/"
+          className="absolute top-6 left-6 flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back</span>
+        </Link>
+
+        <div className="w-full max-w-md space-y-8">
           <div className="text-center">
-            <Link href="/" aria-label="go home" className="mx-auto block w-fit">
-              <LogoIcon />
+            {/* Logo matching header */}
+            <Link href="/" className="inline-flex items-center gap-2 mb-6">
+              <Image
+                src="/icons/logo.png"
+                alt="DevEvent Logo"
+                width={32}
+                height={32}
+              />
+              <span className="text-xl font-bold text-white">DevEvent</span>
             </Link>
-            <h1 className="mb-1 mt-4 text-xl font-semibold">
-              Create a DevEvent Account
-            </h1>
-            <p className="text-sm">Welcome! Create an account to get started</p>
+            <h2 className="text-3xl font-bold tracking-tight">
+              Create an account
+            </h2>
+            <p className="mt-2 text-sm text-zinc-400">
+              Join DevEvent to discover and host events.
+            </p>
           </div>
 
-          <div className="mt-6 space-y-6">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="firstname" className="block text-sm">
-                  Firstname
-                </Label>
-                <Input
-                  type="text"
-                  required
-                  name="firstname"
-                  id="firstname"
-                  value={formData.firstname}
-                  onChange={handleInputChange}
-                />
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="firstname" className="text-zinc-300">
+                    First Name
+                  </Label>
+                  <Input
+                    id="firstname"
+                    name="firstname"
+                    type="text"
+                    required
+                    value={formData.firstname}
+                    onChange={handleInputChange}
+                    className="mt-1 bg-zinc-900 border-zinc-800 text-white placeholder-zinc-500 focus:ring-primary-500 focus:border-primary-500"
+                    placeholder="John"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lastname" className="text-zinc-300">
+                    Last Name
+                  </Label>
+                  <Input
+                    id="lastname"
+                    name="lastname"
+                    type="text"
+                    required
+                    value={formData.lastname}
+                    onChange={handleInputChange}
+                    className="mt-1 bg-zinc-900 border-zinc-800 text-white placeholder-zinc-500 focus:ring-primary-500 focus:border-primary-500"
+                    placeholder="Doe"
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastname" className="block text-sm">
-                  Lastname
-                </Label>
-                <Input
-                  type="text"
-                  required
-                  name="lastname"
-                  id="lastname"
-                  value={formData.lastname}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email" className="block text-sm">
-                Email Address
-              </Label>
-              <Input
-                type="email"
-                required
-                name="email"
-                id="email"
-                value={formData.email}
-                onChange={handleInputChange}
-              />
+              <div>
+                <Label htmlFor="email" className="text-zinc-300">
+                  Email address
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="mt-1 bg-zinc-900 border-zinc-800 text-white placeholder-zinc-500 focus:ring-primary-500 focus:border-primary-500"
+                  placeholder="you@example.com"
+                />
+              </div>
             </div>
 
             {message && (
-              <div className="text-sm text-green-500 text-center font-medium">
-                {message}
+              <div className="rounded-md bg-green-900/50 p-4">
+                <p className="text-sm text-green-300 text-center">{message}</p>
               </div>
             )}
 
-            <Button className="w-full" disabled={loading}>
-              {loading ? "Sending Link..." : "Sign Up with Email"}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-white text-black hover:bg-zinc-200 font-semibold"
+            >
+              {loading ? "Sending Link..." : "Sign Up"}
             </Button>
-          </div>
 
-          <div className="my-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-            <hr className="border-dashed" />
-            <span className="text-muted-foreground text-xs">
-              Or continue With
-            </span>
-            <hr className="border-dashed" />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <Button type="button" variant="outline" disabled>
-              <span>Google</span>
-            </Button>
-            <Button type="button" variant="outline" disabled>
-              <span>Microsoft</span>
-            </Button>
-          </div>
+            <div className="text-center text-sm">
+              <span className="text-zinc-500">Already have an account? </span>
+              <Link
+                href="/sign-in"
+                className="font-medium text-white hover:underline"
+              >
+                Sign in
+              </Link>
+            </div>
+          </form>
         </div>
+      </div>
 
-        <div className="p-3">
-          <p className="text-accent-foreground text-center text-sm">
-            Have an account ?
-            <Button asChild variant="link" className="px-2">
-              <Link href="/sign-in">Sign In</Link>
-            </Button>
-          </p>
-        </div>
-      </form>
-    </section>
+      {/* Right Side: Image */}
+      <div className="hidden lg:block relative h-full w-full">
+        <Image
+          src="/images/event-full.png"
+          alt="Event Background"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/20" />
+      </div>
+    </div>
   );
 }

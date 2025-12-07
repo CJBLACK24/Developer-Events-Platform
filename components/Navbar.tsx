@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 const Navbar = () => {
@@ -36,12 +37,9 @@ const Navbar = () => {
               </button>
             </div>
           ) : (
-            <Link
-              href="/login"
-              className="bg-primary-500 text-dark-100 px-4 py-2 rounded-lg font-bold hover:bg-primary-600 transition-all"
-            >
-              Sign In
-            </Link>
+            <Button asChild className="text-white">
+              <Link href="/sign-in">Sign In</Link>
+            </Button>
           )}
         </ul>
       </nav>
