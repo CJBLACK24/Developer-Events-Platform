@@ -238,7 +238,7 @@ export default function AdminDashboard() {
       <div className="rounded-xl overflow-hidden bg-[#0c151a] border border-[#182830]">
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-[#182830] hover:bg-transparent bg-[#182830]">
+            <TableRow className="border-b border-[#182830] bg-[#182830]">
               <TableHead className="text-gray-400 font-medium text-sm py-4 border-r border-[#182830] text-center">
                 Events
               </TableHead>
