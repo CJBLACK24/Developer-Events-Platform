@@ -42,6 +42,7 @@ const CreateEventForm = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -94,6 +95,8 @@ const CreateEventForm = () => {
     try {
       let imageUrl = "";
 
+      setStatusMessage("Uploading image...");
+
       // 1. Upload Image
       if (imageFile) {
         const uploadFormData = new FormData();
@@ -112,6 +115,8 @@ const CreateEventForm = () => {
         setIsSubmitting(false);
         return;
       }
+
+      setStatusMessage("Saving event details...");
 
       // 2. Prepare Data
       const slug = generateSlug(formData.title);
@@ -160,6 +165,7 @@ const CreateEventForm = () => {
       alert("Failed to create event. " + (error as Error).message);
     } finally {
       setIsSubmitting(false);
+      setStatusMessage("");
     }
   };
 
@@ -433,7 +439,7 @@ const CreateEventForm = () => {
       </div>
 
       <button type="submit" className="submit-btn" disabled={isSubmitting}>
-        {isSubmitting ? "Saving..." : "Save Event"}
+        {isSubmitting ? statusMessage || "Saving..." : "Save Event"}
       </button>
 
       <SuccessDialog
