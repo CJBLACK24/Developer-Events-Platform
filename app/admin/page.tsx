@@ -116,9 +116,13 @@ export default function AdminDashboard() {
         setDeleteDialogOpen(false);
         setEventToDelete(null);
         setShowDeleteSuccess(true);
+      } else {
+        const data = await response.json();
+        alert(`Failed to delete event: ${data.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Error deleting event:", error);
+      alert("An error occurred while deleting the event.");
     }
     setDeleting(false);
   };
