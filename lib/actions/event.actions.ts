@@ -22,8 +22,13 @@ export const getSimilarEventsBySlug = async (
 
 export const getAllEvents = async () => {
   try {
-    await connectDB();
-    const events = await Event.find().sort({ createdAt: -1 });
+    console.log("Starting getAllEvents...");
+    const mongooseInstance = await connectDB();
+    console.log(
+      `Connected to DB, state: ${mongooseInstance.connection.readyState}, fetching events...`
+    );
+    const events = await Event.find().sort({ createdAt: -1 }).maxTimeMS(5000);
+    console.log(`Events fetched: ${events.length}`);
 
     return JSON.parse(JSON.stringify(events));
   } catch (e) {
