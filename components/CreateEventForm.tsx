@@ -118,10 +118,7 @@ const CreateEventForm = () => {
 
       setStatusMessage("Saving event details...");
 
-      // 2. Prepare Data
-      const slug = generateSlug(formData.title);
-      // Ensure unique slug (simple append random string if needed, or let DB fail)
-      // For UX, checking first is better, but keep it simple for now.
+      setStatusMessage("Saving event details...");
 
       const tagsArray = formData.tags
         .split(",")
@@ -132,32 +129,28 @@ const CreateEventForm = () => {
         .map((item) => item.trim())
         .filter(Boolean);
 
-      const formattedDate = normalizeDate(formData.date);
-      // Database expects a valid time string, not a range
-      // We only store start time to avoid "time zone displacement out of range" error
-      const timeString = normalizeTime(formData.startTime);
-
-      // 3. Insert into Supabase
-      const { error } = await supabase.from("events").insert({
-        title: formData.title,
-        slug: slug,
-        date: formattedDate,
-        time: timeString,
-        location: formData.location,
-        venue: formData.venue,
-        mode: formData.mode,
-        description: formData.description,
-        overview: formData.overview || formData.description,
-        audience: formData.audience || "Developers",
-        organizer: formData.organizer || "Community", // Display name
-        tags: tagsArray,
-        agenda: agendaArray,
-        image: imageUrl,
-        organizer_id: user.id, // Link to RBAC user
-        is_approved: true, // Auto-approve for now, or false if you want approval flow
+      // 3. Submit to API (Server-side insertion)
+      const response = await fetch("/api/events", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          image: imageUrl,
+          tags: tagsArray,
+          agenda: agendaArray,
+          organizer_id: user.id,
+          startTime: formData.startTime, // Will be normalized on server if needed, but endpoint expects 'time'
+          time: formData.startTime, // Map startTime to time for the API
+        }),
       });
 
-      if (error) throw error;
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to create event");
+      }
 
       setShowSuccessDialog(true);
     } catch (error) {

@@ -13,59 +13,83 @@ const mapEvent = (event: any) => ({
   updatedAt: event.updated_at || event.created_at,
 });
 
+import { createClient } from "@supabase/supabase-js";
+
+// Init Supabase Admin client
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
+);
+
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
+    const contentType = req.headers.get("content-type") || "";
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const eventData: any = {};
+    let eventData: any = {};
+    let imageUrl = "";
+    let tags: string[] = [];
+    let agenda: string[] = [];
 
-    try {
-      // Extract basic fields
-      for (const [key, value] of formData.entries()) {
-        if (key !== "image" && key !== "tags" && key !== "agenda") {
-          eventData[key] = value;
-        }
-      }
-    } catch {
-      return NextResponse.json(
-        { message: "Invalid form data format" },
-        { status: 400 }
-      );
-    }
+    if (contentType.includes("application/json")) {
+      const body = await req.json();
+      eventData = body;
+      imageUrl = body.image;
+      tags = body.tags || [];
+      agenda = body.agenda || [];
+    } else {
+      const formData = await req.formData();
 
-    const file = formData.get("image") as File;
-
-    if (!file)
-      return NextResponse.json(
-        { message: "Image file is required" },
-        { status: 400 }
-      );
-
-    const tags = JSON.parse(formData.get("tags") as string);
-    const agenda = JSON.parse(formData.get("agenda") as string);
-
-    // Upload to Cloudinary
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const uploadResult = await new Promise((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          { resource_type: "image", folder: "DevEvent" },
-          (error, results) => {
-            if (error) return reject(error);
-            resolve(results);
+      try {
+        // Extract basic fields
+        for (const [key, value] of formData.entries()) {
+          if (key !== "image" && key !== "tags" && key !== "agenda") {
+            eventData[key] = value;
           }
-        )
-        .end(buffer);
-    });
+        }
+      } catch {
+        return NextResponse.json(
+          { message: "Invalid form data format" },
+          { status: 400 }
+        );
+      }
+
+      const file = formData.get("image") as File;
+
+      if (!file)
+        return NextResponse.json(
+          { message: "Image file is required" },
+          { status: 400 }
+        );
+
+      tags = JSON.parse(formData.get("tags") as string);
+      agenda = JSON.parse(formData.get("agenda") as string);
+
+      // Upload to Cloudinary
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      const uploadResult = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            { resource_type: "image", folder: "DevEvent" },
+            (error, results) => {
+              if (error) return reject(error);
+              resolve(results);
+            }
+          )
+          .end(buffer);
+      });
+
+      imageUrl = (uploadResult as { secure_url: string }).secure_url;
+    }
 
     // Prepare data for Supabase
     const slug = generateSlug(eventData.title);
 
     // Check for unique slug
-    const { data: existingSlug } = await supabase
+    const { data: existingSlug } = await supabaseAdmin
       .from("events")
       .select("id")
       .eq("slug", slug)
@@ -86,7 +110,7 @@ export async function POST(req: NextRequest) {
       slug: slug,
       description: eventData.description,
       overview: eventData.overview,
-      image: (uploadResult as { secure_url: string }).secure_url,
+      image: imageUrl,
       venue: eventData.venue,
       location: eventData.location,
       date: formattedDate,
@@ -96,9 +120,11 @@ export async function POST(req: NextRequest) {
       agenda: agenda,
       organizer: eventData.organizer,
       tags: tags,
+      organizer_id: eventData.organizer_id, // Accept from body
+      is_approved: eventData.is_approved ?? true,
     };
 
-    const { data: insertedEvent, error } = await supabase
+    const { data: insertedEvent, error } = await supabaseAdmin
       .from("events")
       .insert([newEventPayload])
       .select()
