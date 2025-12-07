@@ -26,8 +26,14 @@ const Navbar = () => {
 
           {user ? (
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-400 hidden md:block">
-                {profile?.role ? `${profile.role.toUpperCase()}` : "GUEST"}
+              <Link
+                href="/profile"
+                className="text-sm text-gray-400 hover:text-white hidden md:block transition-colors"
+              >
+                {profile?.full_name || user.email?.split("@")[0]}
+              </Link>
+              <span className="text-xs text-primary-500 font-mono uppercase hidden md:block">
+                {profile?.role || "GUEST"}
               </span>
               <button
                 onClick={signOut}
