@@ -99,8 +99,11 @@ export default function EditEventPage() {
 
       const convertTo24Hour = (timeStr: string) => {
         const [time, modifier] = timeStr.split(/(am|pm)/i);
-        let [hours, minutes] = time.split(":");
-        if (!hours || !minutes) return "";
+        const [initialHours, minutes] = time.split(":");
+        if (!initialHours || !minutes) return "";
+
+        let hours = initialHours;
+
         if (modifier.toLowerCase() === "pm" && hours !== "12") {
           hours = String(parseInt(hours, 10) + 12);
         }
