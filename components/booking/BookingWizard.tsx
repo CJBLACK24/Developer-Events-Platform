@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,10 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, LogIn } from "lucide-react";
 import { createBooking } from "@/lib/actions/booking.actions";
 import TicketDisplay from "./TicketDisplay";
 import { AvatarUpload } from "@/components/ui/avatar-upload";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 // --- Schema & Types ---
 
@@ -57,6 +59,9 @@ export default function BookingWizard({
   eventDate,
   eventLocation,
 }: BookingWizardProps) {
+  // Authentication state
+  const { user, loading: authLoading } = useAuth();
+
   const [success, setSuccess] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [ticketData, setTicketData] = useState<any>(null);
@@ -84,6 +89,13 @@ export default function BookingWizard({
     setValue,
     formState: { errors, isSubmitting },
   } = form;
+
+  // Pre-fill email from authenticated user
+  useEffect(() => {
+    if (user?.email) {
+      setValue("email", user.email);
+    }
+  }, [user, setValue]);
 
   // --- Handlers ---
 
@@ -173,6 +185,47 @@ export default function BookingWizard({
 
   if (success && ticketData) {
     return <TicketDisplay ticket={ticketData} />;
+  }
+
+  // Show loading state while checking auth
+  if (authLoading) {
+    return (
+      <div className="w-full bg-[#0D161A] border-[#182830] border rounded-xl p-8 text-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#59DECA] mx-auto" />
+        <p className="text-zinc-400 mt-4">Checking authentication...</p>
+      </div>
+    );
+  }
+
+  // Show sign-in prompt if user is not authenticated
+  if (!user) {
+    return (
+      <div className="w-full bg-[#0D161A] border-[#182830] border rounded-xl p-8 text-center space-y-6">
+        <div className="w-16 h-16 mx-auto bg-[#243B47] rounded-full flex items-center justify-center">
+          <LogIn className="w-8 h-8 text-[#59DECA]" />
+        </div>
+        <div>
+          <h3 className="text-xl font-bold text-white mb-2">Sign in to Book</h3>
+          <p className="text-zinc-400 text-sm">
+            You need to be signed in to book your spot at this event.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3">
+          <Button
+            asChild
+            className="w-full bg-[#59DECA] text-[#0D161A] hover:bg-[#4bc7b5] font-bold"
+          >
+            <Link href="/sign-in">Sign In</Link>
+          </Button>
+          <p className="text-xs text-zinc-500">
+            Don&apos;t have an account?{" "}
+            <Link href="/sign-up" className="text-[#59DECA] hover:underline">
+              Sign up
+            </Link>
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

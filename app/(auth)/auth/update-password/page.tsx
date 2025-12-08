@@ -8,7 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 import supabase from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { LogoIcon } from "@/components/logo";
+import { LogoIcon } from "@/components/shared/Logo";
 
 export default function UpdatePasswordPage() {
   const router = useRouter();
