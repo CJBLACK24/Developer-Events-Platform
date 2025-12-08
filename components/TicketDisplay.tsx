@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -82,7 +83,7 @@ export default function TicketDisplay({ ticket }: TicketProps) {
       className="w-full max-w-md mx-auto"
     >
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2">You're In! 🎉</h2>
+        <h2 className="text-2xl font-bold text-white mb-2">You&apos;re In! 🎉</h2>
         <p className="text-gray-400">See you at the event.</p>
       </div>
 
@@ -90,7 +91,7 @@ export default function TicketDisplay({ ticket }: TicketProps) {
       <div
         id="ticket-node"
         ref={ticketRef}
-        className="bg-gradient-to-br from-dark-200 to-dark-100 border border-[#59DECA]/30 rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(89,222,202,0.1)] relative"
+        className="bg-linear-to-br from-dark-200 to-dark-100 border border-[#59DECA]/30 rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(89,222,202,0.1)] relative"
       >
         {/* Decorative Top */}
         <div className="h-2 bg-[#59DECA] w-full" />
