@@ -4,7 +4,7 @@ import {
   getSimilarEventsBySlug,
 } from "@/lib/actions/event.actions";
 import Image from "next/image";
-import BookEvent from "@/components/BookEvent";
+import BookingWizard from "@/components/BookingWizard";
 import EventCard from "@/components/EventCard";
 
 // Temporary interface until we have a shared types file
@@ -181,9 +181,15 @@ const EventDetails = async ({ params }: { params: Promise<string> }) => {
 
         {/* Right Side - Booking Form */}
         <aside className="event-sidebar">
-          <div className="booking-card">
-            <h2>Book Your Spot</h2>
-            <BookEvent eventId={event._id} slug={slug} />
+          <div className="booking-card w-full">
+            <h2 className="text-xl font-bold mb-4">Book Your Spot</h2>
+            <BookingWizard
+              eventId={event._id}
+              slug={slug}
+              eventTitle={title}
+              eventDate={date}
+              eventLocation={location}
+            />
           </div>
         </aside>
       </div>
