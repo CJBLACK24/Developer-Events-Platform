@@ -225,7 +225,7 @@ export default function BookingWizard({
 
         {/* Name */}
         <div className="space-y-1.5">
-          <Label htmlFor="name" className="text-zinc-300">
+          <Label htmlFor="name" className="text-[#E7F2FF] font-normal">
             Full Name <span className="text-red-400">*</span>
           </Label>
           <Input
@@ -241,7 +241,7 @@ export default function BookingWizard({
 
         {/* Email */}
         <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-zinc-300">
+          <Label htmlFor="email" className="text-[#E7F2FF] font-normal">
             Email Address <span className="text-red-400">*</span>
           </Label>
           <Input
@@ -258,7 +258,7 @@ export default function BookingWizard({
 
         {/* Phone */}
         <div className="space-y-1.5">
-          <Label htmlFor="phone" className="text-zinc-300">
+          <Label htmlFor="phone" className="text-[#E7F2FF] font-normal">
             Phone Number <span className="text-red-400">*</span>
           </Label>
           <div className="relative">
@@ -294,7 +294,10 @@ export default function BookingWizard({
         {/* Job & Company */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="jobTitle" className="text-zinc-300 text-xs">
+            <Label
+              htmlFor="jobTitle"
+              className="text-[#E7F2FF] font-normal text-xs"
+            >
               Job Title / Role (optional)
             </Label>
             <Input
@@ -305,7 +308,10 @@ export default function BookingWizard({
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="company" className="text-zinc-300 text-xs">
+            <Label
+              htmlFor="company"
+              className="text-[#E7F2FF] font-normal text-xs"
+            >
               Company (optional)
             </Label>
             <Input
@@ -319,7 +325,9 @@ export default function BookingWizard({
 
         {/* Tech Focus */}
         <div className="space-y-1.5">
-          <Label className="text-zinc-300">Tech Focus / Interest</Label>
+          <Label className="text-[#E7F2FF] font-normal">
+            Tech Focus / Interest
+          </Label>
           <Select onValueChange={(val) => setValue("techFocus", val)}>
             <SelectTrigger className="bg-[#182830] border border-[#243B47] text-white focus:ring-1 focus:ring-[#59DECA]">
               <SelectValue placeholder="Select your primary interest" />
@@ -337,7 +345,7 @@ export default function BookingWizard({
 
         {/* Hobby */}
         <div className="space-y-1.5">
-          <Label htmlFor="hobby" className="text-zinc-300">
+          <Label htmlFor="hobby" className="text-[#E7F2FF] font-normal">
             Hobby & Interests
           </Label>
           <Input
@@ -350,7 +358,7 @@ export default function BookingWizard({
 
         {/* Why Attend */}
         <div className="space-y-1.5">
-          <Label htmlFor="whyAttend" className="text-zinc-300">
+          <Label htmlFor="whyAttend" className="text-[#E7F2FF] font-normal">
             Why do you want to attend?
           </Label>
           <textarea
