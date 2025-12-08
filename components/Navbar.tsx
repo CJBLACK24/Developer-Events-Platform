@@ -49,8 +49,8 @@ const Navbar = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-dark-100/80 backdrop-blur-md border-b border-dark-200">
-      <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#121212]/50 backdrop-blur-[20px] border-b border-[#151024]">
+      <nav className="container mx-auto px-15 h-[80px] flex items-center justify-between">
         {/* Logo - Left */}
         <Link href="/" className="flex items-center gap-2">
           <Image src="/icons/logo.png" alt="logo" width={28} height={28} />
