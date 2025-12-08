@@ -38,12 +38,10 @@ export const createBooking = async ({
       return { success: false, error: "Invalid event ID" };
     }
 
-    // 1. Transaction-like check: Fetch Event Capacity & Current Counts
-    // We fetch checks in parallel for speed, though strict serial might be safer for high concurrency without locks.
-    // For this MVP/implementation, simplified check is sufficient.
+    // 1. Fetch Event Capacity
     const { data: eventData, error: eventError } = await supabaseAdmin
       .from("events")
-      .select("capacity, title, location, date, time") // Fetch extra fields for ticket
+      .select("capacity, title, location, date, time")
       .eq("id", numericEventId)
       .single();
 
@@ -100,9 +98,6 @@ export const createBooking = async ({
 
     console.log(`[Booking] Success! Code: ${ticketCode}`);
 
-    // TODO: Send Email (awaiting email service implementation)
-    // await sendTicketEmail(...)
-
     revalidatePath(`/events/${slug}`);
     revalidatePath("/admin");
 
@@ -120,6 +115,7 @@ export const createBooking = async ({
     console.error("create booking failed", e);
     return { success: false, error: "Internal server error" };
   }
+};
 
 export const getUserBookings = async (email: string) => {
   try {
@@ -140,4 +136,3 @@ export const getUserBookings = async (email: string) => {
     return [];
   }
 };
-
