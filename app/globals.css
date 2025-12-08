@@ -215,7 +215,7 @@
       @apply flex w-full flex-col lg:flex-row gap-12 items-start mt-12 max-lg:items-center;
 
       .content {
-        @apply flex flex-[2] flex-col gap-8 max-lg:w-full;
+        @apply flex flex-2 flex-col gap-8 max-lg:w-full;
 
         .banner {
           @apply max-h-[457px] w-full rounded-lg object-cover;
@@ -433,7 +433,7 @@
       @apply flex flex-col lg:flex-row gap-10;
 
       .event-main {
-        @apply flex-[2] flex flex-col gap-8;
+        @apply flex-2 flex flex-col gap-8;
 
         .event-banner {
           @apply overflow-hidden rounded-xl;
