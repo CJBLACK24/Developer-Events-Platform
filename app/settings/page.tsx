@@ -215,7 +215,7 @@ export default function SettingsPage() {
               Profile & Security
             </div>
             {activeTab === "profile" && (
-              <div className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-[#59DECA]" />
+              <div className="absolute -bottom-px left-0 right-0 h-0.5 bg-[#59DECA]" />
             )}
           </button>
           <button
