@@ -23,7 +23,12 @@ import TicketDisplay from "./TicketDisplay";
 
 const bookingSchema = z.object({
   name: z.string().min(1, "Full Name is required"),
-  email: z.string().email("Invalid email address"),
+  email: z
+    .string()
+    .email("Invalid email address")
+    .refine((val) => val.endsWith("@gmail.com"), {
+      message: "Only @gmail.com addresses are allowed",
+    }),
   phone: z
     .string()
     .min(1, "Phone number is required")
@@ -247,9 +252,9 @@ export default function BookingWizard({
           <Input
             id="email"
             type="email"
-            placeholder="name@example.com"
+            placeholder="name@gmail.com"
             {...register("email")}
-            className="text-white placeholder:text-zinc-500 focus:ring-1 focus:ring-[#59DECA]"
+            className="text-white focus:ring-1 focus:ring-[#59DECA]"
           />
           {errors.email && (
             <p className="text-red-400 text-xs">{errors.email.message}</p>
@@ -283,7 +288,7 @@ export default function BookingWizard({
               }}
               placeholder="0912 345 6789"
               {...register("phone")}
-              className="text-white placeholder:text-zinc-500 pl-12 focus:ring-1 focus:ring-[#59DECA]"
+              className="text-white pl-12 focus:ring-1 focus:ring-[#59DECA]"
             />
           </div>
           {errors.phone && (
@@ -366,7 +371,7 @@ export default function BookingWizard({
             rows={3}
             placeholder="What are you hoping to learn or achieve?"
             {...register("whyAttend")}
-            className="flex w-full rounded-md border border-[#243B47] bg-[#182830] px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#59DECA] placeholder:text-zinc-500"
+            className="flex w-full rounded-md border border-[#243B47] bg-[#182830] px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#59DECA] placeholder:text-[#DCFFF8]"
           />
         </div>
 
