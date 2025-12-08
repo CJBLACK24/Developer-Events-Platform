@@ -28,7 +28,7 @@ import {
   Ticket,
   LayoutDashboard,
 } from "lucide-react";
-import MyTickets from "@/components/MyTickets";
+import MyTickets from "@/components/booking/MyTickets";
 
 export default function SettingsPage() {
   const { user, profile } = useAuth();

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -15,9 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Upload, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { createBooking } from "@/lib/actions/booking.actions";
 import TicketDisplay from "./TicketDisplay";
+import { AvatarUpload } from "@/components/ui/avatar-upload";
 
 // --- Schema & Types ---
 
@@ -85,16 +85,12 @@ export default function BookingWizard({
     formState: { errors, isSubmitting },
   } = form;
 
-  // Watch phone to ensure we can enforce numeric input if needed,
-  // though regex in Zod handles validation.
-  // We can also prevent non-numeric input onKeyDown.
-
   // --- Handlers ---
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  /**
+   * Handle avatar file selection from AvatarUpload component
+   */
+  const handleAvatarSelect = async (file: File) => {
     // Show local preview immediately
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -183,49 +179,14 @@ export default function BookingWizard({
     <div className="w-full bg-[#0D161A] border-[#182830] border rounded-xl p-6 relative overflow-hidden text-white">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Profile Picture Upload */}
-        <div className="flex flex-col items-center justify-center space-y-3 mb-2">
-          <div className="relative">
-            {avatarPreview ? (
-              <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-[#59DECA]">
-                <Image
-                  src={avatarPreview}
-                  alt="Profile Preview"
-                  fill
-                  className="object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={removeAvatar}
-                  className="absolute top-0 right-0 bg-black/50 p-1 rounded-full text-white hover:bg-red-500 transition-colors"
-                >
-                  <X size={12} />
-                </button>
-              </div>
-            ) : (
-              <label
-                htmlFor="avatar-upload"
-                className="w-24 h-24 rounded-full bg-[#243B47] border-2 border-dashed border-zinc-600 flex flex-col items-center justify-center cursor-pointer hover:border-[#59DECA] transition-colors group"
-              >
-                <Upload className="w-6 h-6 text-zinc-400 group-hover:text-[#59DECA] mb-1" />
-                <span className="text-[10px] text-zinc-400 group-hover:text-white uppercase font-medium">
-                  Upload
-                </span>
-              </label>
-            )}
-            <input
-              id="avatar-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageUpload}
-              disabled={uploading}
-            />
-          </div>
-          {uploading && (
-            <span className="text-xs text-zinc-400 animate-pulse">
-              Uploading...
-            </span>
-          )}
+        <div className="flex flex-col items-center justify-center mb-2">
+          <AvatarUpload
+            onFileSelect={handleAvatarSelect}
+            onRemove={removeAvatar}
+            previewUrl={avatarPreview}
+            uploading={uploading}
+            size="md"
+          />
         </div>
 
         {/* Name */}

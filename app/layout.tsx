@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Schibsted_Grotesk, Martian_Mono } from "next/font/google";
 import "./globals.css";
-import LightRays from "@/components/LightRays";
-import Navbar from "@/components/Navbar";
+import LightRays from "@/components/layout/LightRays";
+import Navbar from "@/components/layout/Navbar";
 import { Analytics } from "@vercel/analytics/react";
+import { AuthProvider } from "@/components/providers/AuthProvider";
+import PageTransitionProvider from "@/components/providers/PageTransitionProvider";
 
 const schibstedGrotesk = Schibsted_Grotesk({
   variable: "--font-schibsted-grotesk",
@@ -20,17 +22,13 @@ export const metadata: Metadata = {
   description: "The Hub for Every Dev Event You Mustn't Miss",
 };
 
-import { AuthProvider } from "@/components/providers/AuthProvider";
-
-// ... (imports)
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <body
         className={`${schibstedGrotesk.variable} ${martianMono.variable} min-h-screen antialiased overflow-x-hidden`}
       >
@@ -64,7 +62,9 @@ export default function RootLayout({
             />
           </div>
 
-          <main className="pt-[80px] relative z-10">{children}</main>
+          <main className="pt-[80px] relative z-10">
+            <PageTransitionProvider>{children}</PageTransitionProvider>
+          </main>
           <Analytics />
         </AuthProvider>
       </body>

@@ -1,5 +1,5 @@
-import ExploreBtn from "@/components/ExploreBtn";
-import EventCard from "@/components/EventCard";
+import ExploreBtn from "@/components/shared/ExploreBtn";
+import EventCard from "@/components/events/EventCard";
 import { getAllEvents } from "@/lib/actions/event.actions";
 
 export const dynamic = "force-dynamic";

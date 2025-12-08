@@ -115,6 +115,14 @@
     @apply bg-background text-foreground;
   }
 
+  /* Focus ring styling for all interactive elements */
+  input:focus,
+  textarea:focus,
+  select:focus,
+  button:focus-visible {
+    @apply outline-none ring-2 ring-[#59DECA] ring-offset-0;
+  }
+
   main {
     @apply mx-auto container flex flex-col sm:px-10 px-5 py-10;
   }
@@ -430,7 +438,7 @@
     }
 
     .event-content {
-      @apply flex flex-col lg:flex-row gap-10;
+      @apply flex flex-col lg:flex-row gap-16;
 
       .event-main {
         @apply flex-2 flex flex-col gap-8;
@@ -485,7 +493,7 @@
       }
 
       .event-sidebar {
-        @apply flex-1 lg:sticky lg:top-24 h-fit;
+        @apply flex-1 lg:sticky lg:top-24 h-fit lg:pl-8;
 
         .booking-card {
           @apply bg-dark-100 border border-dark-200 rounded-xl p-6 card-shadow;

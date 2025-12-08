@@ -4,8 +4,8 @@ import {
   getSimilarEventsBySlug,
 } from "@/lib/actions/event.actions";
 import Image from "next/image";
-import BookingWizard from "@/components/BookingWizard";
-import EventCard from "@/components/EventCard";
+import BookingWizard from "@/components/booking/BookingWizard";
+import EventCard from "@/components/events/EventCard";
 
 // Temporary interface until we have a shared types file
 interface IEvent {
