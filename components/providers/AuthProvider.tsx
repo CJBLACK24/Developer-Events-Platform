@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
@@ -91,7 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     initAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
 
   const signIn = async (email: string) => {

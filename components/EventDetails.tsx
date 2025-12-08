@@ -181,16 +181,16 @@ const EventDetails = async ({ params }: { params: Promise<string> }) => {
 
         {/* Right Side - Booking Form */}
         <aside className="event-sidebar">
-          <div className="booking-card w-full">
-            <h2 className="text-xl font-bold mb-4">Book Your Spot</h2>
-            <BookingWizard
-              eventId={event._id}
-              slug={slug}
-              eventTitle={title}
-              eventDate={date}
-              eventLocation={location}
-            />
-          </div>
+          <h2 className="text-3xl font-bold mb-6 text-center text-white">
+            Book Your Spot
+          </h2>
+          <BookingWizard
+            eventId={event._id}
+            slug={slug}
+            eventTitle={title}
+            eventDate={date}
+            eventLocation={location}
+          />
         </aside>
       </div>
 

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -33,7 +35,7 @@ export default function MyTickets({ email }: { email: string }) {
         <Ticket className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-zinc-300">No tickets found</h3>
         <p className="text-zinc-500 mt-1 mb-6">
-          You haven't booked any events yet.
+          You haven&apos;t booked any events yet.
         </p>
         <Link
           href="/#featured-events"

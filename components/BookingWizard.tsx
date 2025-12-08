@@ -175,7 +175,7 @@ export default function BookingWizard({
   }
 
   return (
-    <div className="w-full bg-[#182830] border border-white/5 rounded-xl p-6 relative overflow-hidden text-white">
+    <div className="w-full bg-[#0D161A] border border-white/5 rounded-xl p-6 relative overflow-hidden text-white">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Profile Picture Upload */}
         <div className="flex flex-col items-center justify-center space-y-3 mb-2">
@@ -292,7 +292,7 @@ export default function BookingWizard({
         </div>
 
         {/* Job & Company */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="jobTitle" className="text-zinc-300 text-xs">
               Job Title / Role

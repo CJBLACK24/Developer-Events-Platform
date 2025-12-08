@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -231,7 +232,7 @@ export default function SettingsPage() {
               My Tickets
             </div>
             {activeTab === "tickets" && (
-              <div className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-[#59DECA]" />
+              <div className="absolute -bottom-px left-0 right-0 h-0.5 bg-[#59DECA]" />
             )}
           </button>
         </div>

@@ -5,6 +5,7 @@ import { createBooking } from "@/lib/actions/booking.actions";
 
 const BookEvent = ({ eventId, slug }: { eventId: string; slug: string }) => {
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -15,7 +16,7 @@ const BookEvent = ({ eventId, slug }: { eventId: string; slug: string }) => {
     setErrorMessage("");
 
     try {
-      const result = await createBooking({ eventId, slug, email });
+      const result = await createBooking({ eventId, slug, email, name });
 
       if (result && result.success) {
         setSubmitted(true);
@@ -42,6 +43,21 @@ const BookEvent = ({ eventId, slug }: { eventId: string; slug: string }) => {
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div>
+            <label htmlFor="name" className="sr-only">
+              Full Name
+            </label>
+            <input
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              id="name"
+              placeholder="Enter your full name"
+              className="w-full px-4 py-2 bg-dark-200 border border-dark-300 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-[#59DECA] transition-colors mb-2"
+              disabled={loading}
+            />
+          </div>
+          <div>
             <label htmlFor="email" className="sr-only">
               Email Address
             </label>
@@ -63,7 +79,7 @@ const BookEvent = ({ eventId, slug }: { eventId: string; slug: string }) => {
 
           <button
             type="submit"
-            disabled={loading || !email}
+            disabled={loading || !email || !name}
             className="w-full py-2 px-4 bg-[#59DECA] hover:bg-[#4ac9b9] disabled:opacity-50 disabled:cursor-not-allowed text-black font-semibold rounded-lg transition-colors flex justify-center items-center"
           >
             {loading ? "Booking..." : "Book your spot"}
