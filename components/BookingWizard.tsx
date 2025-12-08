@@ -176,8 +176,6 @@ export default function BookingWizard({
 
   return (
     <div className="w-full bg-[#182830] border border-white/5 rounded-xl p-6 relative overflow-hidden text-white">
-      <h1 className="text-2xl font-bold text-white mb-6">Book Your Spot</h1>
-
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Profile Picture Upload */}
         <div className="flex flex-col items-center justify-center space-y-3 mb-2">
