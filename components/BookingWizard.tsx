@@ -295,7 +295,7 @@ export default function BookingWizard({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="jobTitle" className="text-zinc-300 text-xs">
-              Job Title / Role
+              Job Title / Role (optional)
             </Label>
             <Input
               id="jobTitle"
@@ -306,7 +306,7 @@ export default function BookingWizard({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="company" className="text-zinc-300 text-xs">
-              Company
+              Company (optional)
             </Label>
             <Input
               id="company"
