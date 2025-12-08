@@ -1,6 +1,17 @@
 "use server";
 
-import supabase from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
+
+// Initialize Supabase Admin strictly for server actions
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      persistSession: false,
+    },
+  }
+);
 
 export const createBooking = async ({
   eventId,
@@ -16,30 +27,37 @@ export const createBooking = async ({
       `Booking submission started for event: ${slug}, user: ${email}`
     );
 
-    // In Supabase schema, event_id expects a number (BIGINT).
-    // Mongoose used strings (ObjectIds).
-    // The previous refactor mapped `id` (bigint) to `_id` (string) for frontend compatibility.
-    // If eventId comes from frontend as a string, we might need to parse it if it looks like a number,
-    // or checks if we kept ObjectIds. Since we are moving to Supabase, IDs are likely BIGINTs now.
-    // The Supabase 'events' table uses BIGINT id.
-
     // Ensure we send the correct ID type.
     const numericEventId = parseInt(eventId, 10);
 
-    const { error } = await supabase.from("bookings").insert({
-      event_id: isNaN(numericEventId) ? null : numericEventId,
+    if (isNaN(numericEventId)) {
+      console.error("Invalid event ID:", eventId);
+      return { success: false, error: "Invalid event ID" };
+    }
+
+    // Use Service Role to bypass RLS
+    const { error } = await supabaseAdmin.from("bookings").insert({
+      event_id: numericEventId,
       email,
     });
 
     if (error) {
       console.error("Booking creation validation/insert failed:", error);
-      throw new Error(error.message);
+      // Check for duplicate key error (code 23505 in Postgres)
+      if (error.code === "23505") {
+        // Ideally check constraint name, but generic message is okay
+        // Assuming unique constraint on (event_id, email)
+        console.log("Duplicate booking attempt");
+        // Treat as success to avoid leaking/confusing user, OR return specific error
+        return { success: true };
+      }
+      return { success: false, error: error.message };
     }
 
     console.log("Booking created successfully in Supabase");
     return { success: true };
   } catch (e) {
     console.error("create booking failed", e);
-    return { success: false };
+    return { success: false, error: "Internal server error" };
   }
 };
