@@ -67,7 +67,7 @@ const EventDetails = async ({ params }: { params: Promise<string> }) => {
   const similarEvents: IEvent[] = await getSimilarEventsBySlug(slug);
 
   return (
-    <section className="event-details-page">
+    <section className="event-details-page mt-10">
       {/* Header Section */}
       <div className="event-header">
         <h1>{title}</h1>

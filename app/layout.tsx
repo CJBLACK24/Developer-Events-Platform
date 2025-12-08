@@ -39,19 +39,32 @@ export default function RootLayout({
 
           <div className="fixed inset-0 z-0 pointer-events-none">
             <LightRays
-              raysOrigin="top-center-offset"
+              raysOrigin="top-center"
               raysColor="#5dfeca"
-              raysSpeed={0.5}
-              lightSpread={0.9}
+              raysSpeed={1}
+              lightSpread={2}
               rayLength={1.4}
               followMouse={true}
               mouseInfluence={0.02}
               noiseAmount={0.0}
               distortion={0.01}
+              className="absolute inset-0"
+            />
+            <LightRays
+              raysOrigin="top-center"
+              raysColor="#5dfeca"
+              raysSpeed={1}
+              lightSpread={2}
+              rayLength={1.4}
+              followMouse={true}
+              mouseInfluence={0.02}
+              noiseAmount={0.0}
+              distortion={0.01}
+              className="absolute inset-0"
             />
           </div>
 
-          <main className="pt-16 relative z-10">{children}</main>
+          <main className="pt-[80px] relative z-10">{children}</main>
           <Analytics />
         </AuthProvider>
       </body>
