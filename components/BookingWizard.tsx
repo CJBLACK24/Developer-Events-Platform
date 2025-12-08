@@ -175,7 +175,7 @@ export default function BookingWizard({
   }
 
   return (
-    <div className="w-full bg-[#0D161A] border border-white/5 rounded-xl p-6 relative overflow-hidden text-white">
+    <div className="w-full bg-[#0D161A] border-[#182830] border rounded-xl p-6 relative overflow-hidden text-white">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Profile Picture Upload */}
         <div className="flex flex-col items-center justify-center space-y-3 mb-2">
@@ -232,7 +232,7 @@ export default function BookingWizard({
             id="name"
             placeholder="First & Last Name"
             {...register("name")}
-            className="bg-[#243B47] border-none text-white placeholder:text-zinc-500 focus:ring-1 focus:ring-[#59DECA]"
+            className="text-white placeholder:text-zinc-500 focus:ring-1 focus:ring-[#59DECA]"
           />
           {errors.name && (
             <p className="text-red-400 text-xs">{errors.name.message}</p>
@@ -249,7 +249,7 @@ export default function BookingWizard({
             type="email"
             placeholder="name@example.com"
             {...register("email")}
-            className="bg-[#243B47] border-none text-white placeholder:text-zinc-500 focus:ring-1 focus:ring-[#59DECA]"
+            className="text-white placeholder:text-zinc-500 focus:ring-1 focus:ring-[#59DECA]"
           />
           {errors.email && (
             <p className="text-red-400 text-xs">{errors.email.message}</p>
@@ -283,7 +283,7 @@ export default function BookingWizard({
               }}
               placeholder="0912 345 6789"
               {...register("phone")}
-              className="bg-[#243B47] border-none text-white placeholder:text-zinc-500 pl-12 focus:ring-1 focus:ring-[#59DECA]"
+              className="text-white placeholder:text-zinc-500 pl-12 focus:ring-1 focus:ring-[#59DECA]"
             />
           </div>
           {errors.phone && (
@@ -301,7 +301,7 @@ export default function BookingWizard({
               id="jobTitle"
               placeholder="e.g. Engineer"
               {...register("jobTitle")}
-              className="bg-[#243B47] border-none text-white placeholder:text-zinc-500 text-sm focus:ring-1 focus:ring-[#59DECA]"
+              className="text-white placeholder:text-zinc-500 text-sm focus:ring-1 focus:ring-[#59DECA]"
             />
           </div>
           <div className="space-y-1.5">
@@ -312,7 +312,7 @@ export default function BookingWizard({
               id="company"
               placeholder="e.g. Acme Inc"
               {...register("company")}
-              className="bg-[#243B47] border-none text-white placeholder:text-zinc-500 text-sm focus:ring-1 focus:ring-[#59DECA]"
+              className="text-white placeholder:text-zinc-500 text-sm focus:ring-1 focus:ring-[#59DECA]"
             />
           </div>
         </div>
@@ -321,10 +321,10 @@ export default function BookingWizard({
         <div className="space-y-1.5">
           <Label className="text-zinc-300">Tech Focus / Interest</Label>
           <Select onValueChange={(val) => setValue("techFocus", val)}>
-            <SelectTrigger className="bg-[#243B47] border-none text-white focus:ring-1 focus:ring-[#59DECA]">
+            <SelectTrigger className="bg-[#182830] border border-[#243B47] text-white focus:ring-1 focus:ring-[#59DECA]">
               <SelectValue placeholder="Select your primary interest" />
             </SelectTrigger>
-            <SelectContent className="bg-[#182830] border-zinc-700 text-white">
+            <SelectContent className="bg-[#182830] border-[#243B47] text-white">
               <SelectItem value="frontend">Frontend Engineering</SelectItem>
               <SelectItem value="backend">Backend & Infrastructure</SelectItem>
               <SelectItem value="ai">AI / Machine Learning</SelectItem>
@@ -344,7 +344,7 @@ export default function BookingWizard({
             id="hobby"
             placeholder="e.g. Coding, Reading Books"
             {...register("hobby")}
-            className="bg-[#243B47] border-none text-white placeholder:text-zinc-500 focus:ring-1 focus:ring-[#59DECA]"
+            className="text-white placeholder:text-zinc-500 focus:ring-1 focus:ring-[#59DECA]"
           />
         </div>
 
@@ -358,7 +358,7 @@ export default function BookingWizard({
             rows={3}
             placeholder="What are you hoping to learn or achieve?"
             {...register("whyAttend")}
-            className="flex w-full rounded-md border-none bg-[#243B47] px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#59DECA] placeholder:text-zinc-500"
+            className="flex w-full rounded-md border border-[#243B47] bg-[#182830] px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#59DECA] placeholder:text-zinc-500"
           />
         </div>
 

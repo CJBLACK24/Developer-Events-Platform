@@ -63,20 +63,20 @@ const Navbar = () => {
         <div className="flex items-center gap-8">
           <Link
             href="/"
-            className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
+            className="text-base font-medium text-gray-300 hover:text-white transition-colors"
           >
             Home
           </Link>
           <Link
             href="/#featured-events"
-            className="text-sm font-medium text-gray-300 hover:text-white transition-colors"
+            className="text-base font-medium text-gray-300 hover:text-white transition-colors"
           >
             Events
           </Link>
           {isOrganizer && (
             <Link
               href="/events/create"
-              className="text-sm font-medium text-gray-300 hover:text-white transition-colors flex items-center gap-1"
+              className="text-base font-medium text-gray-300 hover:text-white transition-colors flex items-center gap-1"
             >
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">Create Event</span>
@@ -85,7 +85,7 @@ const Navbar = () => {
           {isAdmin && (
             <Link
               href="/admin"
-              className="text-sm font-medium text-primary-500 hover:text-primary-400 transition-colors flex items-center gap-1"
+              className="text-base font-medium text-primary-500 hover:text-primary-400 transition-colors flex items-center gap-1"
             >
               <Shield className="w-4 h-4" />
               <span className="hidden sm:inline">Admin</span>
