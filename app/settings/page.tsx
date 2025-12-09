@@ -242,6 +242,7 @@ export default function SettingsPage() {
                     <p className="text-xs text-zinc-500">
                       Click to upload a new photo
                     </p>
+                  </div>
                 </div>
 
                 <Separator className="bg-zinc-800" />
