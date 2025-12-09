@@ -41,6 +41,7 @@ export default function SettingsPage() {
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize state from profile when it loads
   useEffect(() => {
@@ -76,15 +77,17 @@ export default function SettingsPage() {
     }
   };
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
+  /**
+   * Handle avatar file selection from AvatarUpload component
+   */
+  const handleAvatarUpload = async (file: File) => {
+    if (!user) return;
 
     setUploading(true);
     try {
-      // Upload to Cloudinary
+      // Upload to server
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("image", file);
 
       const response = await fetch("/api/upload", {
         method: "POST",
@@ -227,37 +230,18 @@ export default function SettingsPage() {
               <CardContent className="space-y-6">
                 {/* Avatar Upload */}
                 <div className="flex items-center gap-6">
-                  <div className="relative">
-                    <Avatar className="h-24 w-24 border-4 border-zinc-800">
-                      <AvatarImage src={avatarUrl} alt={fullName} />
-                      <AvatarFallback className="bg-zinc-800 text-white text-2xl">
-                        {getInitials(fullName, user?.email)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploading}
-                      className="absolute bottom-0 right-0 p-2 bg-primary-500 rounded-full text-black hover:bg-primary-400 transition-colors disabled:opacity-50"
-                    >
-                      <Camera className="w-4 h-4" />
-                    </button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleAvatarUpload}
-                    />
-                  </div>
+                  <AvatarUpload
+                    onFileSelect={handleAvatarUpload}
+                    onRemove={() => setAvatarUrl("")}
+                    previewUrl={avatarUrl}
+                    uploading={uploading}
+                    size="lg"
+                  />
                   <div className="space-y-1">
                     <p className="text-sm text-zinc-400">Profile Photo</p>
                     <p className="text-xs text-zinc-500">
-                      Click the camera icon to upload a new photo
+                      Click to upload a new photo
                     </p>
-                    {uploading && (
-                      <p className="text-xs text-primary-500">Uploading...</p>
-                    )}
-                  </div>
                 </div>
 
                 <Separator className="bg-zinc-800" />
