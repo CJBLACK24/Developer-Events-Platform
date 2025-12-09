@@ -33,8 +33,8 @@ export default function Footer() {
   const pathname = usePathname();
   const currentYear = new Date().getFullYear();
 
-  // Hide footer on sign-in and sign-up pages
-  if (pathname === "/sign-in" || pathname === "/sign-up") {
+  // Only show footer on the home page
+  if (pathname !== "/") {
     return null;
   }
 
