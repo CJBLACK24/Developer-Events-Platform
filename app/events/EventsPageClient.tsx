@@ -233,7 +233,7 @@ export default function EventsPageClient() {
                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectValue placeholder="All Modes" />
                     </SelectTrigger>
-                    <SelectContent className="bg-zinc-900 border-zinc-700">
+                    <SelectContent className="bg-zinc-900 border-zinc-700 text-white">
                       <SelectItem value="all">All Modes</SelectItem>
                       <SelectItem value="in-person">In-Person</SelectItem>
                       <SelectItem value="virtual">Virtual</SelectItem>
@@ -252,7 +252,7 @@ export default function EventsPageClient() {
                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
-                    <SelectContent className="bg-zinc-900 border-zinc-700">
+                    <SelectContent className="bg-zinc-900 border-zinc-700 text-white">
                       <SelectItem value="all">All Categories</SelectItem>
                       {allTags.map((tag) => (
                         <SelectItem key={tag} value={tag.toLowerCase()}>
@@ -273,7 +273,7 @@ export default function EventsPageClient() {
                     <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                       <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
-                    <SelectContent className="bg-zinc-900 border-zinc-700">
+                    <SelectContent className="bg-zinc-900 border-zinc-700 text-white">
                       <SelectItem value="date">Date (Upcoming)</SelectItem>
                       <SelectItem value="date-desc">Date (Latest)</SelectItem>
                       <SelectItem value="title">Title (A-Z)</SelectItem>
