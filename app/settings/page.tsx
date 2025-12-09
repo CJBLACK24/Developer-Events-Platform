@@ -2,8 +2,7 @@
 "use client";
 
 import { useAuth } from "@/components/providers/AuthProvider";
-import { useState, useRef } from "react";
-import supabase from "@/lib/supabase";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,24 +19,22 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Camera,
   User,
-  Lock,
   Shield,
   Mail,
   Check,
   AlertCircle,
   Ticket,
-  LayoutDashboard,
 } from "lucide-react";
 import MyTickets from "@/components/booking/MyTickets";
+import { AvatarUpload } from "@/components/ui/avatar-upload";
 
 export default function SettingsPage() {
   const { user, profile } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState("profile"); // profile | tickets
 
   // Profile State
-  const [fullName, setFullName] = useState(profile?.full_name || "");
-  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || "");
+  const [fullName, setFullName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [profileMessage, setProfileMessage] = useState<{
@@ -45,15 +42,13 @@ export default function SettingsPage() {
     text: string;
   } | null>(null);
 
-  // Password State
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [changingPassword, setChangingPassword] = useState(false);
-  const [passwordMessage, setPasswordMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
+  // Initialize state from profile when it loads
+  useEffect(() => {
+    if (profile) {
+      setFullName(profile.full_name || "");
+      setAvatarUrl(profile.avatar_url || "");
+    }
+  }, [profile]);
 
   const getInitials = (
     name: string | null | undefined,
@@ -155,46 +150,6 @@ export default function SettingsPage() {
       setProfileMessage({ type: "error", text: "Failed to update profile." });
     } finally {
       setSaving(false);
-    }
-  };
-
-  const handleChangePassword = async () => {
-    setPasswordMessage(null);
-
-    if (newPassword !== confirmPassword) {
-      setPasswordMessage({ type: "error", text: "Passwords do not match." });
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setPasswordMessage({
-        type: "error",
-        text: "Password must be at least 6 characters.",
-      });
-      return;
-    }
-
-    setChangingPassword(true);
-
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
-
-      if (error) throw error;
-
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setPasswordMessage({
-        type: "success",
-        text: "Password changed successfully!",
-      });
-    } catch (error) {
-      console.error(error);
-      setPasswordMessage({ type: "error", text: "Failed to change password." });
-    } finally {
-      setChangingPassword(false);
     }
   };
 
@@ -382,79 +337,6 @@ export default function SettingsPage() {
                   className="bg-white text-black hover:bg-zinc-200"
                 >
                   {saving ? "Saving..." : "Save Changes"}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Password Section */}
-            <Card className="bg-zinc-900 border-zinc-800">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <Lock className="w-5 h-5 text-primary-500" />
-                  <div>
-                    <CardTitle className="text-white">Password</CardTitle>
-                    <CardDescription className="text-zinc-400">
-                      Change your password
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="newPassword" className="text-zinc-300">
-                    New Password
-                  </Label>
-                  <Input
-                    id="newPassword"
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="bg-zinc-800 border-zinc-700 text-white placeholder-zinc-500 focus:border-primary-500"
-                    placeholder="••••••••"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-zinc-300">
-                    Confirm New Password
-                  </Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="bg-zinc-800 border-zinc-700 text-white placeholder-zinc-500 focus:border-primary-500"
-                    placeholder="••••••••"
-                  />
-                </div>
-
-                {/* Message */}
-                {passwordMessage && (
-                  <div
-                    className={`flex items-center gap-2 p-3 rounded-lg ${
-                      passwordMessage.type === "success"
-                        ? "bg-green-900/30 text-green-400"
-                        : "bg-red-900/30 text-red-400"
-                    }`}
-                  >
-                    {passwordMessage.type === "success" ? (
-                      <Check className="w-4 h-4" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4" />
-                    )}
-                    <span className="text-sm">{passwordMessage.text}</span>
-                  </div>
-                )}
-
-                <Button
-                  onClick={handleChangePassword}
-                  disabled={
-                    changingPassword || !newPassword || !confirmPassword
-                  }
-                  variant="outline"
-                  className="border-zinc-700 text-white hover:bg-zinc-800"
-                >
-                  {changingPassword ? "Changing..." : "Change Password"}
                 </Button>
               </CardContent>
             </Card>
