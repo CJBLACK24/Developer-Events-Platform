@@ -52,6 +52,9 @@ interface BookingWizardProps {
   eventLocation: string;
 }
 
+// Helper to get localStorage key for this event
+const getTicketStorageKey = (slug: string) => `ticket_${slug}`;
+
 export default function BookingWizard({
   eventId,
   slug,
@@ -62,12 +65,37 @@ export default function BookingWizard({
   // Authentication state
   const { user, loading: authLoading } = useAuth();
 
+  // Initialize from localStorage if available
   const [success, setSuccess] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [ticketData, setTicketData] = useState<any>(null);
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  // Load ticket from localStorage on mount
+  useEffect(() => {
+    const storageKey = getTicketStorageKey(slug);
+    const savedTicket = localStorage.getItem(storageKey);
+    if (savedTicket) {
+      try {
+        const parsed = JSON.parse(savedTicket);
+        setTicketData(parsed);
+        setSuccess(true);
+      } catch (e) {
+        console.error("Failed to parse saved ticket", e);
+        localStorage.removeItem(storageKey);
+      }
+    }
+  }, [slug]);
+
+  // Persist ticket to localStorage when it changes
+  useEffect(() => {
+    if (ticketData && success) {
+      const storageKey = getTicketStorageKey(slug);
+      localStorage.setItem(storageKey, JSON.stringify(ticketData));
+    }
+  }, [ticketData, success, slug]);
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
@@ -229,8 +257,14 @@ export default function BookingWizard({
   }
 
   return (
-    <div className="w-full bg-[#0D161A] border-[#182830] border rounded-xl p-6 relative overflow-hidden text-white">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <div className="w-full">
+      {/* Header */}
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-white">
+        Book Your Spot
+      </h2>
+      
+      <div className="bg-[#0D161A] border-[#182830] border rounded-xl p-4 sm:p-6 relative overflow-hidden text-white">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Profile Picture Upload */}
         <div className="flex flex-col items-center justify-center mb-2">
           <AvatarUpload
