@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
+import { uploadProtection } from "@/lib/arcjet";
 
 cloudinary.config({
   cloud_name: "cjblackdev",
@@ -10,11 +11,41 @@ cloudinary.config({
 });
 
 export async function POST(req: NextRequest) {
+  // Apply Arcjet protection (rate limiting + bot detection)
+  try {
+    // Cast to Request for Arcjet compatibility
+    const decision = await uploadProtection.protect(req as unknown as Request, {
+      requested: 1, // Consume 1 token
+    });
+
+    if (decision.isDenied()) {
+      if (decision.reason.isRateLimit()) {
+        return NextResponse.json(
+          { message: "Too many upload requests. Please try again later." },
+          { status: 429 }
+        );
+      }
+      if (decision.reason.isBot()) {
+        return NextResponse.json(
+          { message: "Bot detected. Access denied." },
+          { status: 403 }
+        );
+      }
+      return NextResponse.json(
+        { message: "Request blocked." },
+        { status: 403 }
+      );
+    }
+  } catch (arcjetError) {
+    // If Arcjet fails, log but don't block the request
+    console.warn("Arcjet protection error:", arcjetError);
+  }
+
   try {
     const formData = await req.formData();
-    const file = formData.get("image") as File;
+    const file = formData.get("image") ?? formData.get("file");
 
-    if (!file) {
+    if (!file || !(file instanceof File)) {
       return NextResponse.json(
         { message: "Image file is required" },
         { status: 400 }

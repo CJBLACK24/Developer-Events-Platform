@@ -6,6 +6,7 @@ import {
 import Image from "next/image";
 import BookingWizard from "@/components/booking/BookingWizard";
 import EventCard from "@/components/events/EventCard";
+import CapacityDisplay from "@/components/events/CapacityDisplay";
 
 // Temporary interface until we have a shared types file
 interface IEvent {
@@ -181,6 +182,10 @@ const EventDetails = async ({ params }: { params: Promise<string> }) => {
 
         {/* Right Side - Booking Form */}
         <aside className="event-sidebar">
+          {/* Capacity Display */}
+          <div className="mb-4 p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
+            <CapacityDisplay eventId={event._id} showDetailed />
+          </div>
           <BookingWizard
             eventId={event._id}
             slug={slug}

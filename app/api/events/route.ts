@@ -22,7 +22,57 @@ const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!
 );
 
+import aj from "@/lib/arcjet";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+
 export async function POST(req: NextRequest) {
+  // 1. Arcjet Protection
+  try {
+    const decision = await aj.protect(req as unknown as Request, {
+      requested: 1, // Consume 1 token
+    });
+    if (decision.isDenied()) {
+      if (decision.reason.isRateLimit()) {
+        return NextResponse.json(
+          { message: "Too many requests. Please try again later." },
+          { status: 429 }
+        );
+      }
+      return NextResponse.json({ message: "Access denied." }, { status: 403 });
+    }
+  } catch (error) {
+    console.warn("Arcjet error:", error);
+  }
+
+  // 2. User Verification
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll() {
+          // Internal API, no need to set cookies
+        },
+      },
+    }
+  );
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json(
+      { message: "Unauthorized. Please log in." },
+      { status: 401 }
+    );
+  }
+
   try {
     const contentType = req.headers.get("content-type") || "";
 
@@ -120,7 +170,7 @@ export async function POST(req: NextRequest) {
       agenda: agenda,
       organizer: eventData.organizer,
       tags: tags,
-      organizer_id: eventData.organizer_id, // Accept from body
+      organizer_id: user.id, // Enforce authenticated user ID
       is_approved: eventData.is_approved ?? true,
     };
 

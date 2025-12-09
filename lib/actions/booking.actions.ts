@@ -2,6 +2,11 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
+import { sendEmail } from "@/lib/mail";
+import {
+  getBookingConfirmationEmail,
+  getCancellationEmail,
+} from "@/lib/mail/templates";
 
 // Initialize Supabase Admin strictly for server actions
 const supabaseAdmin = createClient(
@@ -107,6 +112,32 @@ export const createBooking = async ({
       .toUpperCase()}`;
     console.log(`[Booking] Success! Code: ${displayCode}`);
 
+    // Send confirmation email (async, non-blocking)
+    try {
+      const emailHtml = getBookingConfirmationEmail({
+        attendeeName: name,
+        eventName: eventData.title,
+        eventDate: new Date(eventData.date).toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+        eventTime: eventData.time || "TBA",
+        eventLocation: eventData.location || "Online",
+        ticketCode: displayCode,
+      });
+      await sendEmail(
+        email,
+        `Booking Confirmed: ${eventData.title}`,
+        emailHtml
+      );
+      console.log(`[Booking] Confirmation email sent to ${email}`);
+    } catch (emailError) {
+      // Don't fail the booking if email fails
+      console.error("Failed to send confirmation email:", emailError);
+    }
+
     revalidatePath(`/events/${slug}`);
     revalidatePath("/admin");
 
@@ -143,5 +174,118 @@ export const getUserBookings = async (email: string) => {
   } catch (error) {
     console.error("Unexpected error fetching bookings:", error);
     return [];
+  }
+};
+
+/**
+ * Cancels a booking
+ * - Validates booking exists and belongs to user
+ * - Updates status to cancelled
+ */
+export const cancelBooking = async (bookingId: string, email: string) => {
+  try {
+    console.log(`[Booking] Cancelling booking: ${bookingId} for ${email}`);
+
+    // Verify the booking exists and belongs to this email
+    const { data: booking, error: fetchError } = await supabaseAdmin
+      .from("bookings")
+      .select("id, email, status, event_id, events(title, slug)")
+      .eq("id", bookingId)
+      .single();
+
+    if (fetchError || !booking) {
+      return { success: false, error: "Booking not found" };
+    }
+
+    if (booking.email !== email) {
+      return { success: false, error: "Unauthorized to cancel this booking" };
+    }
+
+    if (booking.status === "cancelled") {
+      return { success: false, error: "Booking is already cancelled" };
+    }
+
+    // Update booking status to cancelled
+    const { error: updateError } = await supabaseAdmin
+      .from("bookings")
+      .update({ status: "cancelled" })
+      .eq("id", bookingId);
+
+    if (updateError) {
+      console.error("Cancel booking failed:", updateError);
+      return { success: false, error: "Failed to cancel booking" };
+    }
+
+    // Revalidate paths
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const event = booking.events as any;
+    if (event?.slug) {
+      revalidatePath(`/events/${event.slug}`);
+    }
+    revalidatePath("/settings");
+    revalidatePath("/admin");
+
+    // Send cancellation email (async, non-blocking)
+    try {
+      // Get attendee name from booking metadata
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const metadata = booking.metadata as any;
+      const attendeeName = metadata?.name || "Attendee";
+
+      const emailHtml = getCancellationEmail({
+        attendeeName,
+        eventName: event?.title || "Event",
+      });
+      await sendEmail(
+        email,
+        `Booking Cancelled: ${event?.title || "Event"}`,
+        emailHtml
+      );
+      console.log(`[Booking] Cancellation email sent to ${email}`);
+    } catch (emailError) {
+      // Don't fail the cancellation if email fails
+      console.error("Failed to send cancellation email:", emailError);
+    }
+
+    console.log(`[Booking] Successfully cancelled booking: ${bookingId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Cancel booking error:", error);
+    return { success: false, error: "Internal server error" };
+  }
+};
+
+/**
+ * Get event capacity information
+ */
+export const getEventCapacity = async (eventId: string) => {
+  try {
+    const numericEventId = parseInt(eventId, 10);
+    if (isNaN(numericEventId)) {
+      return { capacity: null, booked: 0, available: null };
+    }
+
+    // Get event capacity
+    const { data: event } = await supabaseAdmin
+      .from("events")
+      .select("capacity")
+      .eq("id", numericEventId)
+      .single();
+
+    // Get current booking count
+    const { count } = await supabaseAdmin
+      .from("bookings")
+      .select("*", { count: "exact", head: true })
+      .eq("event_id", numericEventId)
+      .eq("status", "confirmed");
+
+    const booked = count || 0;
+    const capacity = event?.capacity || null;
+    const available = capacity ? capacity - booked : null;
+
+    return { capacity, booked, available };
+  } catch (error) {
+    console.error("Get capacity error:", error);
+    return { capacity: null, booked: 0, available: null };
   }
 };

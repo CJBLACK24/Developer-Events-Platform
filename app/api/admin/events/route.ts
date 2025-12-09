@@ -1,13 +1,73 @@
 import { createClient } from "@supabase/supabase-js";
-import { NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
+import { cookies } from "next/headers";
 
-// Server-side Supabase client
+// Server-side Supabase client for admin operations
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export async function GET(request: Request) {
+// Helper to verify admin role
+async function verifyAdminRole(): Promise<{
+  isAdmin: boolean;
+  error?: string;
+}> {
+  try {
+    const cookieStore = await cookies();
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll() {
+            // Not needed for read-only auth check
+          },
+        },
+      }
+    );
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { isAdmin: false, error: "Unauthorized: Not authenticated" };
+    }
+
+    // Check user role
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile || profile.role !== "admin") {
+      return { isAdmin: false, error: "Forbidden: Admin access required" };
+    }
+
+    return { isAdmin: true };
+  } catch (error) {
+    console.error("Admin verification error:", error);
+    return { isAdmin: false, error: "Authentication error" };
+  }
+}
+
+export async function GET(request: NextRequest) {
+  // Verify admin role
+  const { isAdmin, error } = await verifyAdminRole();
+  if (!isAdmin) {
+    return NextResponse.json(
+      { error: error || "Unauthorized" },
+      { status: error?.includes("Forbidden") ? 403 : 401 }
+    );
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
