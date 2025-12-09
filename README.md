@@ -24,13 +24,16 @@ A modern, full-stack web application for developers to discover, host, and atten
 
 ## Getting Started
 
-1.  Clone the repository
-2.  Install dependencies:
+1. Clone the repository
+2. Install dependencies:
+
     ```bash
     npm install
     ```
-3.  Set up environment variables (Supabase, Cloudinary, Arcjet)
-4.  Run the development server:
+
+3. Set up environment variables (Supabase, Cloudinary, Arcjet)
+4. Run the development server:
+
     ```bash
     npm run dev
     ```
