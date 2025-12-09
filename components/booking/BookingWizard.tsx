@@ -262,187 +262,190 @@ export default function BookingWizard({
       <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-white">
         Book Your Spot
       </h2>
-      
+
       <div className="bg-[#0D161A] border-[#182830] border rounded-xl p-4 sm:p-6 relative overflow-hidden text-white">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        {/* Profile Picture Upload */}
-        <div className="flex flex-col items-center justify-center mb-2">
-          <AvatarUpload
-            onFileSelect={handleAvatarSelect}
-            onRemove={removeAvatar}
-            previewUrl={avatarPreview}
-            uploading={uploading}
-            size="md"
-          />
-        </div>
+          {/* Profile Picture Upload */}
+          <div className="flex flex-col items-center justify-center mb-2">
+            <AvatarUpload
+              onFileSelect={handleAvatarSelect}
+              onRemove={removeAvatar}
+              previewUrl={avatarPreview}
+              uploading={uploading}
+              size="md"
+            />
+          </div>
 
-        {/* Name */}
-        <div className="space-y-1.5">
-          <Label htmlFor="name" className="text-[#E7F2FF] font-normal">
-            Full Name <span className="text-red-400">*</span>
-          </Label>
-          <Input
-            id="name"
-            placeholder="Enter your name"
-            {...register("name")}
-            className="text-white focus:ring-1 focus:ring-[#59DECA]"
-          />
-          {errors.name && (
-            <p className="text-red-400 text-xs">{errors.name.message}</p>
-          )}
-        </div>
+          {/* Name */}
+          <div className="space-y-1.5">
+            <Label htmlFor="name" className="text-[#E7F2FF] font-normal">
+              Full Name <span className="text-red-400">*</span>
+            </Label>
+            <Input
+              id="name"
+              placeholder="Enter your name"
+              {...register("name")}
+              className="text-white focus:ring-1 focus:ring-[#59DECA]"
+            />
+            {errors.name && (
+              <p className="text-red-400 text-xs">{errors.name.message}</p>
+            )}
+          </div>
 
-        {/* Email */}
-        <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-[#E7F2FF] font-normal">
-            Email Address <span className="text-red-400">*</span>
-          </Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="Enter your email"
-            {...register("email")}
-            className="text-white focus:ring-1 focus:ring-[#59DECA]"
-          />
-          {errors.email && (
-            <p className="text-red-400 text-xs">{errors.email.message}</p>
-          )}
-        </div>
+          {/* Email */}
+          <div className="space-y-1.5">
+            <Label htmlFor="email" className="text-[#E7F2FF] font-normal">
+              Email Address <span className="text-red-400">*</span>
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              {...register("email")}
+              className="text-white focus:ring-1 focus:ring-[#59DECA]"
+            />
+            {errors.email && (
+              <p className="text-red-400 text-xs">{errors.email.message}</p>
+            )}
+          </div>
 
-        {/* Phone */}
-        <div className="space-y-1.5">
-          <Label htmlFor="phone" className="text-[#E7F2FF] font-normal">
-            Phone Number <span className="text-red-400">*</span>
-          </Label>
-          <div className="relative">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none select-none">
-              <span className="text-lg mr-2">🇵🇭</span>
+          {/* Phone */}
+          <div className="space-y-1.5">
+            <Label htmlFor="phone" className="text-[#E7F2FF] font-normal">
+              Phone Number <span className="text-red-400">*</span>
+            </Label>
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none select-none">
+                <span className="text-lg mr-2">🇵🇭</span>
+              </div>
+              <Input
+                id="phone"
+                // Enforce strictly numeric typing prevention in UI, additional to Zod
+                onKeyDown={(e) => {
+                  const allowed = [
+                    "Backspace",
+                    "Tab",
+                    "ArrowLeft",
+                    "ArrowRight",
+                    "Delete",
+                    "Enter",
+                  ];
+                  if (!/^[0-9]$/.test(e.key) && !allowed.includes(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+                placeholder="Enter your phone number (e.g. 09123456789)"
+                {...register("phone")}
+                className="text-white pl-12 focus:ring-1 focus:ring-[#59DECA]"
+              />
             </div>
+            {errors.phone && (
+              <p className="text-red-400 text-xs">{errors.phone.message}</p>
+            )}
+          </div>
+
+          {/* Job & Company */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="jobTitle"
+                className="text-[#E7F2FF] font-normal text-xs"
+              >
+                Job Title / Role (optional)
+              </Label>
+              <Input
+                id="jobTitle"
+                placeholder="Enter your job title"
+                {...register("jobTitle")}
+                className="text-white text-sm focus:ring-1 focus:ring-[#59DECA]"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="company"
+                className="text-[#E7F2FF] font-normal text-xs"
+              >
+                Company (optional)
+              </Label>
+              <Input
+                id="company"
+                placeholder="Enter your company name"
+                {...register("company")}
+                className="text-white text-sm focus:ring-1 focus:ring-[#59DECA]"
+              />
+            </div>
+          </div>
+
+          {/* Tech Focus */}
+          <div className="space-y-1.5">
+            <Label className="text-[#E7F2FF] font-normal">
+              Tech Focus / Interest
+            </Label>
+            <Select onValueChange={(val) => setValue("techFocus", val)}>
+              <SelectTrigger className="bg-[#182830] border border-[#243B47] focus:ring-1 focus:ring-[#59DECA] ">
+                <SelectValue placeholder="Select your primary interest" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#182830] border-[#DCFFF8] text-white">
+                <SelectItem value="frontend">Frontend Engineering</SelectItem>
+                <SelectItem value="backend">
+                  Backend & Infrastructure
+                </SelectItem>
+                <SelectItem value="ai">AI / Machine Learning</SelectItem>
+                <SelectItem value="mobile">Mobile Development</SelectItem>
+                <SelectItem value="design">Product Design</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Hobby */}
+          <div className="space-y-1.5">
+            <Label htmlFor="hobby" className="text-[#E7F2FF] font-normal">
+              Hobby & Interests
+            </Label>
             <Input
-              id="phone"
-              // Enforce strictly numeric typing prevention in UI, additional to Zod
-              onKeyDown={(e) => {
-                const allowed = [
-                  "Backspace",
-                  "Tab",
-                  "ArrowLeft",
-                  "ArrowRight",
-                  "Delete",
-                  "Enter",
-                ];
-                if (!/^[0-9]$/.test(e.key) && !allowed.includes(e.key)) {
-                  e.preventDefault();
-                }
-              }}
-              placeholder="Enter your phone number (e.g. 09123456789)"
-              {...register("phone")}
-              className="text-white pl-12 focus:ring-1 focus:ring-[#59DECA]"
+              id="hobby"
+              placeholder="e.g. Coding, Reading Books"
+              {...register("hobby")}
+              className="text-white focus:ring-1 focus:ring-[#59DECA]"
             />
           </div>
-          {errors.phone && (
-            <p className="text-red-400 text-xs">{errors.phone.message}</p>
+
+          {/* Why Attend */}
+          <div className="space-y-1.5">
+            <Label htmlFor="whyAttend" className="text-[#E7F2FF] font-normal">
+              Why do you want to attend?
+            </Label>
+            <textarea
+              id="whyAttend"
+              rows={3}
+              placeholder="What are you hoping to learn or achieve?"
+              {...register("whyAttend")}
+              className="flex w-full rounded-md border border-[#243B47] bg-[#182830] px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#59DECA] placeholder:text-[#DCFFF8]"
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="pt-2">
+            <Button
+              type="submit"
+              className="w-full bg-[#59DECA] text-[#182830] hover:bg-[#4bc7b5] font-bold text-base py-6 transition-transform active:scale-95"
+              disabled={isSubmitting || uploading}
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-5 h-5 animate-spin mr-2" />
+              ) : null}
+              {isSubmitting ? "Confirming..." : "Confirm Booking"}
+            </Button>
+          </div>
+
+          {error && (
+            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <p className="text-red-400 text-sm text-center">{error}</p>
+            </div>
           )}
-        </div>
-
-        {/* Job & Company */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label
-              htmlFor="jobTitle"
-              className="text-[#E7F2FF] font-normal text-xs"
-            >
-              Job Title / Role (optional)
-            </Label>
-            <Input
-              id="jobTitle"
-              placeholder="Enter your job title"
-              {...register("jobTitle")}
-              className="text-white text-sm focus:ring-1 focus:ring-[#59DECA]"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label
-              htmlFor="company"
-              className="text-[#E7F2FF] font-normal text-xs"
-            >
-              Company (optional)
-            </Label>
-            <Input
-              id="company"
-              placeholder="Enter your company name"
-              {...register("company")}
-              className="text-white text-sm focus:ring-1 focus:ring-[#59DECA]"
-            />
-          </div>
-        </div>
-
-        {/* Tech Focus */}
-        <div className="space-y-1.5">
-          <Label className="text-[#E7F2FF] font-normal">
-            Tech Focus / Interest
-          </Label>
-          <Select onValueChange={(val) => setValue("techFocus", val)}>
-            <SelectTrigger className="bg-[#182830] border border-[#243B47] focus:ring-1 focus:ring-[#59DECA] ">
-              <SelectValue placeholder="Select your primary interest" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#182830] border-[#DCFFF8] text-white">
-              <SelectItem value="frontend">Frontend Engineering</SelectItem>
-              <SelectItem value="backend">Backend & Infrastructure</SelectItem>
-              <SelectItem value="ai">AI / Machine Learning</SelectItem>
-              <SelectItem value="mobile">Mobile Development</SelectItem>
-              <SelectItem value="design">Product Design</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Hobby */}
-        <div className="space-y-1.5">
-          <Label htmlFor="hobby" className="text-[#E7F2FF] font-normal">
-            Hobby & Interests
-          </Label>
-          <Input
-            id="hobby"
-            placeholder="e.g. Coding, Reading Books"
-            {...register("hobby")}
-            className="text-white focus:ring-1 focus:ring-[#59DECA]"
-          />
-        </div>
-
-        {/* Why Attend */}
-        <div className="space-y-1.5">
-          <Label htmlFor="whyAttend" className="text-[#E7F2FF] font-normal">
-            Why do you want to attend?
-          </Label>
-          <textarea
-            id="whyAttend"
-            rows={3}
-            placeholder="What are you hoping to learn or achieve?"
-            {...register("whyAttend")}
-            className="flex w-full rounded-md border border-[#243B47] bg-[#182830] px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#59DECA] placeholder:text-[#DCFFF8]"
-          />
-        </div>
-
-        {/* Actions */}
-        <div className="pt-2">
-          <Button
-            type="submit"
-            className="w-full bg-[#59DECA] text-[#182830] hover:bg-[#4bc7b5] font-bold text-base py-6 transition-transform active:scale-95"
-            disabled={isSubmitting || uploading}
-          >
-            {isSubmitting ? (
-              <Loader2 className="w-5 h-5 animate-spin mr-2" />
-            ) : null}
-            {isSubmitting ? "Confirming..." : "Confirm Booking"}
-          </Button>
-        </div>
-
-        {error && (
-          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-            <p className="text-red-400 text-sm text-center">{error}</p>
-          </div>
-        )}
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
