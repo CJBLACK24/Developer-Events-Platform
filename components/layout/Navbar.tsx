@@ -80,8 +80,10 @@ const Navbar = () => {
           {/* Logo - Left */}
           <Link href="/" className="flex items-center gap-2">
             <Image src="/icons/logo.png" alt="logo" width={28} height={28} />
-            <span className="text-lg font-bold text-white hidden sm:block">
-              DevEvent
+            {/* Desktop Brand */}
+            <span className="text-xl font-bold text-white hidden sm:block">
+              <span className="italic">Dev</span>
+              <span className="text-[#59DECA]">Event</span>
             </span>
           </Link>
 
@@ -210,7 +212,7 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden"
               onClick={closeMobileMenu}
             />
 
@@ -220,7 +222,7 @@ const Navbar = () => {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 left-0 bottom-0 w-72 bg-[#0D161A] border-r border-[#182830] z-[70] lg:hidden flex flex-col"
+              className="fixed top-0 left-0 bottom-0 w-72 bg-[#0D161A] border-r border-[#182830] z-50 lg:hidden flex flex-col"
             >
               {/* Sidebar Header with Logo */}
               <div className="p-4 border-b border-[#182830] flex items-center justify-between">
@@ -229,13 +231,10 @@ const Navbar = () => {
                   className="flex items-center gap-2"
                   onClick={closeMobileMenu}
                 >
-                  <Image
-                    src="/icons/logo.png"
-                    alt="logo"
-                    width={28}
-                    height={28}
-                  />
-                  <span className="text-lg font-bold text-white">DevEvent</span>
+                  <span className="text-xl font-bold text-white">
+                    <span className="italic">Dev</span>
+                    <span className="text-[#59DECA]">Event</span>
+                  </span>
                 </Link>
                 <button
                   onClick={closeMobileMenu}

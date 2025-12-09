@@ -45,10 +45,8 @@ export default function Footer() {
           {/* Brand & Socials Section */}
           <div className="flex flex-col gap-6">
             <Link href="/" className="inline-block">
-              <span className="text-2xl font-bold text-white flex items-center gap-2">
-                {/* Logo Icon (Optional, using square bracket mock from image or just text) */}
-                {/* <div className="w-8 h-8 bg-white/10 rounded border border-white/20"></div> */}
-                Dev<span className="text-[#59DECA]">Event</span>.com
+              <span className="text-xl font-bold text-white">
+                developer-events-platform.vercel.app
               </span>
             </Link>
 
@@ -75,7 +73,7 @@ export default function Footer() {
               <h3 className="text-white font-bold mb-6 uppercase text-sm tracking-wider">
                 Platform
               </h3>
-              <ul className="space-y-4">
+              <ul className="space-y-4 list-none p-0 m-0">
                 {footerLinks.platform.map((link) => (
                   <li key={link.label}>
                     <Link
@@ -92,7 +90,7 @@ export default function Footer() {
               <h3 className="text-white font-bold mb-6 uppercase text-sm tracking-wider">
                 Company
               </h3>
-              <ul className="space-y-4">
+              <ul className="space-y-4 list-none p-0 m-0">
                 {footerLinks.company.map((link) => (
                   <li key={link.label}>
                     <Link
@@ -109,7 +107,7 @@ export default function Footer() {
               <h3 className="text-white font-bold mb-6 uppercase text-sm tracking-wider">
                 Legal
               </h3>
-              <ul className="space-y-4">
+              <ul className="space-y-4 list-none p-0 m-0">
                 {footerLinks.legal.map((link) => (
                   <li key={link.label}>
                     <Link
@@ -126,22 +124,15 @@ export default function Footer() {
         </div>
 
         {/* Bottom Text / Copyright */}
-        {/* Using visual hierarchy for copyright to keep it clean */}
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-zinc-900/50 mt-10">
           <p className="text-zinc-600 text-sm">
-            © {currentYear} DevEvent. All rights reserved.
+            © {currentYear} developer-events-platform.vercel.app. All rights
+            reserved.
           </p>
           <p className="text-zinc-600 text-sm flex items-center gap-1 mt-2 md:mt-0">
             Made with <Heart className="w-4 h-4 text-zinc-600" /> for developers
           </p>
         </div>
-      </div>
-
-      {/* Large Background Text */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full select-none pointer-events-none overflow-hidden leading-none">
-        <h1 className="text-[15vw] font-bold text-zinc-900/40 text-center whitespace-nowrap tracking-tighter opacity-50 translate-y-[20%]">
-          DevEvent.com
-        </h1>
       </div>
     </footer>
   );
