@@ -1,16 +1,21 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import aj from "./lib/arcjet";
 
-// Routes that require authentication
-const protectedRoutes = ["/settings", "/events/create"];
+export async function proxy(request: NextRequest) {
+  // Clear way to protect all routes with Arcjet
+  const decision = await aj.protect(request, { requested: 1 });
 
-// Routes that require admin role
-const adminRoutes = ["/admin"];
+  if (decision.isDenied()) {
+    if (decision.reason.isRateLimit()) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+    if (decision.reason.isBot()) {
+      return NextResponse.json({ error: "Bot detected" }, { status: 403 });
+    }
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
-// Routes that require organizer or admin role
-const organizerRoutes = ["/events/create"];
-
-export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -38,15 +43,16 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make your app slow
-  // because it will unnecessarily block the rendering.
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
+
+  // Routes configuration moved inside for clarity or could be imported
+  const protectedRoutes = ["/settings", "/events/create"];
+  const adminRoutes = ["/admin"];
+  const organizerRoutes = ["/events/create"];
 
   // Check if route is protected
   const isProtectedRoute = protectedRoutes.some((route) =>
@@ -66,7 +72,6 @@ export async function middleware(request: NextRequest) {
 
   // If user exists but trying to access admin/organizer routes, check role
   if (user && (isAdminRoute || isOrganizerRoute)) {
-    // Fetch user profile to check role
     const { data: profile } = await supabase
       .from("profiles")
       .select("role")
