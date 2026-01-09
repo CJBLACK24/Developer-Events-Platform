@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import EventCard from "@/components/events/EventCard";
+import { EventsGridSkeleton } from "@/components/ui/loading-skeleton";
 
 interface IEvent {
   _id: string;
@@ -152,14 +153,15 @@ export default function EventsPageClient() {
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-zinc-900 border border-zinc-800 rounded-lg h-80 animate-pulse"
-            />
-          ))}
+        <div className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
+            Browse Events
+          </h1>
+          <p className="text-zinc-400">
+            Discover developer events happening near you
+          </p>
         </div>
+        <EventsGridSkeleton count={6} />
       </div>
     );
   }

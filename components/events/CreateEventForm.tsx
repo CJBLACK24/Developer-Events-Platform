@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { Button } from "@/components/ui/button";
 import { SuccessDialog } from "@/components/ui/success-dialog";
 import { Clock } from "lucide-react";
 
@@ -429,9 +430,13 @@ const CreateEventForm = () => {
         />
       </div>
 
-      <button type="submit" className="submit-btn" disabled={isSubmitting}>
+      <Button
+        type="submit"
+        isLoading={isSubmitting}
+        className="w-full bg-[#59DECA] text-black hover:bg-[#4ac9b8] font-bold py-4 text-lg rounded-xl mt-6 transition-all transform active:scale-[0.98]"
+      >
         {isSubmitting ? statusMessage || "Saving..." : "Save Event"}
-      </button>
+      </Button>
 
       <SuccessDialog
         open={showSuccessDialog}

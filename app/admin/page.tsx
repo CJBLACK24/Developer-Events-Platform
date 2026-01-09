@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/dialog";
 import { SuccessDialog } from "@/components/ui/success-dialog";
 import { Users, Calendar, CheckCircle, XCircle } from "lucide-react";
+import { DashboardSkeleton } from "@/components/ui/loading-skeleton";
+import { motion } from "framer-motion";
 
 interface Event {
   id: string;
@@ -158,15 +160,16 @@ export default function AdminDashboard() {
   };
 
   if (loading && events.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-white">Loading dashboard...</div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="container mx-auto px-4 py-8 max-w-7xl"
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl sm:text-4xl font-bold text-white">
@@ -399,6 +402,6 @@ export default function AdminDashboard() {
         message="The event has been successfully removed."
         buttonText="Continue"
       />
-    </div>
+    </motion.div>
   );
 }

@@ -169,10 +169,10 @@ export default function SignUpPage() {
 
             <Button
               type="submit"
-              disabled={loading}
-              className="w-full h-11 bg-white text-black hover:bg-zinc-200 font-semibold text-sm"
+              isLoading={loading}
+              className="w-full h-11 bg-[#59DECA] text-black hover:bg-[#4ac9b8] font-semibold text-sm transition-all transform active:scale-[0.98]"
             >
-              {loading ? "Sending Link..." : "Sign Up"}
+              Sign Up
             </Button>
 
             <div className="text-center text-sm">
